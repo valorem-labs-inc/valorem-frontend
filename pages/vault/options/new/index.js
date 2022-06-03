@@ -204,7 +204,7 @@ class NewOption extends React.Component {
     return web3.utils.soliditySha3(...valuesWithTypes);
   };
 
-  handleGetChainToCreate = () => {
+  handleGetOptionType = () => {
     return {
       underlyingAsset: this.state.underlyingAsset,
       exerciseTimestamp: ethers.BigNumber.from(moment(this.state.exerciseTimestamp).unix()),
@@ -232,7 +232,7 @@ class NewOption extends React.Component {
       const signer = this.connection?.signer;
 
       this.contractWithSigner = contract ? contract.connect(signer) : null;
-      this.chain = this.handleGetChainToCreate();
+      this.chain = this.handleGetOptionType();
 
       const hasRequiredBalance = await this.checkIfHasRequiredBalance(
         this.chain.underlyingAsset,
@@ -241,15 +241,11 @@ class NewOption extends React.Component {
       );
   
       if (!hasRequiredBalance) {
-        const totalAmountRequiredInEther = this.chain?.underlyingAmount * this.state.numberOfContracts;
-        this.setState({ writingOption: false, lowBalanceWarning: `Sorry, you don't have enough of this token to write this option.` });
+        this.setState({ writingOption: false, lowBalanceWarning: `Balance of underlying asset too low to write.` });
         return;
       }
 
-      console.log({
-        hasRequiredBalance,
-      });
-
+      // TODO(Check if a chain of this type already exists by doing a lookup)
       this.setState({ writingOption: true }, () => {
         this.contractWithSigner.newChain(this.chain).then(async (response) => {
           this.contractWithSigner.on('NewChain', async (optionId) => {
