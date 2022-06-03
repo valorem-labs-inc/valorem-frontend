@@ -8,7 +8,7 @@ import Vault from '../../../layouts/vault';
 import Button from '../../../components/button';
 import OptionModal from '../../../components/optionModal';
 import Loader from '../../../components/loader';
-import { activeOptions as activeOptionsQuery, expiredOptions as expiredOptionsQuery } from '../../../graphql/queries/options';
+import { options } from '../../../graphql/queries/options';
 import store from '../../../lib/store';
 import graphql from '../../../graphql/client';
 import unfreezeApolloCacheValue from '../../../lib/unfreezeApolloCacheValue';
@@ -42,45 +42,38 @@ class Options extends React.Component {
   handleFetchOptions = async (list = 'active') => {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
+      console.log("wallet", state?.wallet?.connection?.accounts[0])
       const query = {
-        active: {
-          query: activeOptionsQuery,
-          skip: !state?.wallet?.connection?.accounts[1],
+          query: options,
+          skip: !state?.wallet?.connection?.accounts[0],
           variables: {
-            where: {
-              creator: state?.wallet?.connection?.accounts[1],
-              expiryTimestamp_gt: moment().unix(),
-            },
+            account: state?.wallet?.connection?.accounts[0].toLowerCase(),
           },
-        },
-        expired: {
-          query: expiredOptionsQuery,
-          skip: !state?.wallet?.connection?.accounts[1],
-          variables: {
-            where: {
-              creator: state?.wallet?.connection?.accounts[1],
-              expiryTimestamp_lt: moment().unix(),
-            },
-          },
-        },
-      }[list];
+        }
 
       const { data } = await graphql.query(query);
-      const sanitizedData = unfreezeApolloCacheValue(data?.options || []);
+      const optionsData = data?.account?.ERC1155balances.filter(item => item.token.type === 1).map(item => item.token.option)
+      const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
+
+      console.log(1)
   
+      const sortedAndFormattedData = _.sortBy(sanitizedData, 'expiryTimestamp')?.map((option) => {
+        return {
+          ...option,
+          exerciseAmount: parseInt(ethers.utils.formatEther(option?.exerciseAmount), 10),
+          underlyingAmount: parseInt(ethers.utils.formatEther(option?.underlyingAmount), 10),
+          underlyingAsset: getToken(option?.underlyingAsset),
+          exerciseAsset: getToken(option?.exerciseAsset),
+          exerciseTimestamp: moment(option?.exerciseTimestamp, 'X').format(),
+          expiryTimestamp: moment(option?.expiryTimestamp, 'X').format(),
+        };
+      })
+
+      console.log("sorted", sortedAndFormattedData)
+
       this.setState({
         loading: false,
-        options: _.sortBy(sanitizedData, 'expiryTimestamp')?.map((option) => {
-          return {
-            ...option,
-            exerciseAmount: parseInt(ethers.utils.formatEther(option?.exerciseAmount), 10),
-            underlyingAmount: parseInt(ethers.utils.formatEther(option?.underlyingAmount), 10),
-            underlyingAsset: getToken(option?.underlyingAsset),
-            exerciseAsset: getToken(option?.exerciseAsset),
-            exerciseTimestamp: moment(option?.exerciseTimestamp, 'X').format(),
-            expiryTimestamp: moment(option?.expiryTimestamp, 'X').format(),
-          };
-        }),
+        options: sortedAndFormattedData
       });
     });
   };
