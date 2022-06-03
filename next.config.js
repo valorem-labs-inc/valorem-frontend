@@ -12,7 +12,7 @@ module.exports = {
       },
     },
     subgraph: {
-      uri: 'https://api.studio.thegraph.com/query/13157/valorem-options/0.0.13',
+      uri: 'https://api.studio.thegraph.com/query/13157/valorem-options/0.0.14',
     },
     infura: {
       projectId: '11b7fd47c34f4b8097cea3ffc2e215f1',

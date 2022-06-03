@@ -99,25 +99,19 @@ class NewOption extends React.Component {
     return true;
   };
 
-  checkIfHasRequiredBalance = async (underlyingAsset = '', underlyingAmountInEther = 0, numberOfContracts = 0) => {
+  checkIfHasRequiredBalance = async (underlyingAsset, underlyingAmount, numberOfContracts) => {
     const state = store.getState();
     const erc20 = state?.wallet?.connection?.erc20;
     const erc20Instance = erc20(underlyingAsset);
-    const underlyingAssetBalanceAsBigNumber = await erc20Instance.balanceOf(state?.wallet?.connection?.accounts[0]);
-    const underlyingAssetBalanceAsEther = ethers.utils.formatEther(underlyingAssetBalanceAsBigNumber);
-    const totalUnderlyingAmount = underlyingAmountInEther * numberOfContracts;
+    const underlyingAssetBalance = await erc20Instance.balanceOf(state?.wallet?.connection?.accounts[0]);
+    const totalUnderlyingAmount = underlyingAmount * numberOfContracts;
 
     console.log({
-      underlyingAssetBalanceAsBigNumber,
-      underlyingAssetBalanceAsEther,
+      underlyingAssetBalance,
       totalUnderlyingAmount,
     });
 
-    if (underlyingAssetBalanceAsBigNumber > totalUnderlyingAmount) {
-      return true;
-    }
-    
-    return false;
+    return underlyingAssetBalance > totalUnderlyingAmount;
   };
 
   handleVerifyHash = async (contractWithSigner = {}, chainHash = '') => {
@@ -210,15 +204,15 @@ class NewOption extends React.Component {
     return web3.utils.soliditySha3(...valuesWithTypes);
   };
 
-  handleGetChainToCreate = () => {
+  handleGetOptionType = () => {
     return {
       underlyingAsset: this.state.underlyingAsset,
       exerciseTimestamp: ethers.BigNumber.from(moment(this.state.exerciseTimestamp).unix()),
       expiryTimestamp: ethers.BigNumber.from(moment(this.state.expiryTimestamp).unix()),
       exerciseAsset: this.state.exerciseAsset,
-      exerciseAmount: ethers.utils.parseUnits(this?.state?.exerciseAmount),
+      exerciseAmount: ethers.utils.parseEther(this?.state?.exerciseAmount),
       settlementSeed: ethers.BigNumber.from(0),
-      underlyingAmount: ethers.utils.parseUnits(this?.state?.underlyingAmount),
+      underlyingAmount: ethers.utils.parseEther(this?.state?.underlyingAmount),
     };
   };
 
@@ -228,7 +222,7 @@ class NewOption extends React.Component {
     return connection;
   };
 
-  handleWriteNewOption = async (event) => {
+  handleWriteOption = async (event) => {
     event.preventDefault();
 
     this.setState({ writingOption: true, lowBalanceWarning: null }, async () => {
@@ -238,7 +232,7 @@ class NewOption extends React.Component {
       const signer = this.connection?.signer;
 
       this.contractWithSigner = contract ? contract.connect(signer) : null;
-      this.chain = this.handleGetChainToCreate();
+      this.chain = this.handleGetOptionType();
 
       const hasRequiredBalance = await this.checkIfHasRequiredBalance(
         this.chain.underlyingAsset,
@@ -247,19 +241,11 @@ class NewOption extends React.Component {
       );
   
       if (!hasRequiredBalance) {
-        const totalAmountRequiredInEther = this.chain?.underlyingAmount * this.state.numberOfContracts;
-        this.setState({ writingOption: false, lowBalanceWarning: `Sorry, you don't have enough of this token to write this option.` });
+        this.setState({ writingOption: false, lowBalanceWarning: `Balance of underlying asset too low to write.` });
         return;
       }
 
-      console.log({
-        hasRequiredBalance,
-      });
-
-      // NOTE: If balance requirements are met, parse Ether to WEI before handing to contract.
-      this.chain.exerciseAmount = ethers.utils.parseEther(this?.state?.exerciseAmount);
-      this.chain.underlyingAmount = ethers.utils.parseEther(this?.state?.underlyingAmount);
-
+      // TODO(Check if a chain of this type already exists by doing a lookup)
       this.setState({ writingOption: true }, () => {
         this.contractWithSigner.newChain(this.chain).then(async (response) => {
           this.contractWithSigner.on('NewChain', async (optionId) => {
@@ -296,7 +282,7 @@ class NewOption extends React.Component {
           <header>
             <h4>Write New Option</h4>
           </header>
-          <form disabled={writingOption} onSubmit={this.handleWriteNewOption}>
+          <form disabled={writingOption} onSubmit={this.handleWriteOption}>
             <div className="contract-options">
               <div className="form-row">
                 <div className="form-input-group">
