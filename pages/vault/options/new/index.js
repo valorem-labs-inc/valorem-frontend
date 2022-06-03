@@ -1,7 +1,7 @@
 import React from 'react';
 import DateTime from 'react-datetime';
 import moment from 'moment';
-import { ethers } from 'ethers';
+import {ethers} from 'ethers';
 import Web3 from 'web3';
 import Vault from '../../../../layouts/vault';
 import Amount from '../../../../components/amount';
@@ -12,6 +12,7 @@ import OptionModal from '../../../../components/optionModal';
 import store from '../../../../lib/store';
 
 import StyledNewOption from './index.css.js';
+import Router from "next/router";
 
 const web3 = new Web3();
 const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
@@ -26,9 +27,11 @@ class NewOption extends React.Component {
     underlyingAsset: '',
     underlyingAssetName: '', // NOTE: Just for display, not used in transaction.
     underlyingAmount: 0,
-    lowBalanceWarning: null,
+    writeWarning: null,
     writingOption: false,
+    balanceTooLow: false,
     needsApproval: false,
+    needsNewOptionType: false
   };
 
   handleWrite = (contract = {}, optionId = '', numberOfContracts = 0) => {
@@ -38,32 +41,56 @@ class NewOption extends React.Component {
       numberOfContracts,
     })
 
+    // TODO(This should push to the option detail once it exists)
     contract.write(optionId, numberOfContracts).then((response) => {
       contract.on('OptionsWritten', (optionId, writer, claimId, amount) => {
-        // TODO: Confirm or redirect?
-        console.log('OptionsWritten', {
-          optionId,
-          writer,
-          claimId,
-          amount,
-        });
+        Router.push('/vault/options');
       });
     });
   };
 
   handleWriteContract = async () => {
+    const hasRequiredBalance = await this.checkIfHasRequiredBalance(
+        this.optionType.underlyingAsset,
+        this.optionType.underlyingAmount,
+        this.state.numberOfContracts,
+    );
     const hasAllowance = await this.checkIfHasAllowance(this.state?.underlyingAsset, this.connection?.optionsSettlementEngineAddress);
+    const optionId = await this.handleGetOptionTypeId(this.contractWithSigner, this.handleGetOptionTypeHash(this.optionType));
 
-    console.log({hasAllowance});
+    console.log(hasRequiredBalance, hasAllowance, optionId);
 
-    if (hasAllowance) {
+    if (!hasRequiredBalance) {
+      this.setState({
+        balanceTooLow: true,
+        writingOption: false,
+        writeWarning: `Balance of underlying asset too low to write.`
+      });
+    }
+    else {
+      this.setState({balanceTooLow: false, writeWarning: null});
+    }
+
+    if (!hasAllowance) {
+      this.setState({needsApproval: true});
+    }
+    else {
+      this.setState({needsApproval: false})
+    }
+    if (optionId === ethers.BigNumber.from(0)) {
+      this.setState({ needsNewOptionType: true});
+    }
+    else {
+      this.setState({needsNewOptionType: false})
+    }
+
+
+    if (!this.state.balanceTooLow && !this.state.needsApproval && !this.state.needsNewOptionType){
       this.handleWrite(
-        this.contractWithSigner,
-        this?.optionId?.toNumber(),
-        ethers.BigNumber.from(this.state.numberOfContracts)
+          this.contractWithSigner,
+          optionId,
+          ethers.BigNumber.from(this.state.numberOfContracts)
       );
-    } else {
-      this.setState({ needsApproval: true });
     }
   };
 
@@ -92,11 +119,10 @@ class NewOption extends React.Component {
     const erc20Instance = erc20(underlyingAsset);
     const allowanceResponse = await erc20Instance.allowance(state?.wallet?.connection?.accounts[0], optionsSettlementEngineAddress);
 
-    if (allowanceResponse?._hex === '0x00') {
-      return false;
-    }
+    // TODO(This should check not just that it's gt 0, but greater than the actual amount required)
+    return allowanceResponse?._hex !== '0x00';
 
-    return true;
+
   };
 
   checkIfHasRequiredBalance = async (underlyingAsset, underlyingAmount, numberOfContracts) => {
@@ -114,7 +140,7 @@ class NewOption extends React.Component {
     return underlyingAssetBalance > totalUnderlyingAmount;
   };
 
-  handleVerifyHash = async (contractWithSigner = {}, chainHash = '') => {
+  handleGetOptionTypeId = async (contractWithSigner = {}, chainHash = '') => {
     try {
       return contractWithSigner.hashToOptionToken(chainHash);
     } catch (exception) {
@@ -122,86 +148,11 @@ class NewOption extends React.Component {
     }
   };
 
-  handleGetChainHash = (contractWithSigner = {}, chain = {}) => {
-    // const encodings = {
-    //   web3abi: web3.eth.abi.encodeParameters(
-    //     ['address', 'uint40', 'uint40', 'address', 'uint96', 'uint160', 'uint96'],
-    //     Object.values(chain)
-    //   ),
-    //   ethersabi: ethers.utils.defaultAbiCoder.encode([
-    //     'address',
-    //     'uint40',
-    //     'uint40',
-    //     'address',
-    //     'uint96',
-    //     'uint160',
-    //     'uint96',
-    //   ], Object.values(chain))
-    // };
-
-    // const hashes = {
-    //   web3Hash: web3.utils.sha3(
-    //     web3.eth.abi.encodeParameters(
-    //       ['address', 'uint40', 'uint40', 'address', 'uint96', 'uint160', 'uint96'],
-    //       Object.values(chain)
-    //     ),
-    //   ),
-    //   ethersKeccak256: ethers.utils.keccak256(
-    //     ethers.utils.defaultAbiCoder.encode([
-    //       'address',
-    //       'uint40',
-    //       'uint40',
-    //       'address',
-    //       'uint96',
-    //       'uint160',
-    //       'uint96',
-    //     ], Object.values(chain))
-    //   ),
-    //   ethersSHA256: ethers.utils.sha256(
-    //     ethers.utils.defaultAbiCoder.encode([
-    //       'address',
-    //       'uint40',
-    //       'uint40',
-    //       'address',
-    //       'uint96',
-    //       'uint160',
-    //       'uint96',
-    //     ], Object.values(chain))
-    //   ),
-    //   solidityKeccak256: ethers.utils.solidityKeccak256([
-    //     'address',
-    //     'uint40',
-    //     'uint40',
-    //     'address',
-    //     'uint96',
-    //     'uint160',
-    //     'uint96',
-    //   ], Object.values(chain)),
-    // };
-
-    // return Promise.all(Object.entries(hashes).map(async ([hashName, hashValue]) => {
-    //   return {
-    //     hashName,
-    //     hashValue,
-    //     encodings,
-    //     result: await this.handleVerifyHash(contractWithSigner, hashValue),
-    //   };
-    // }));
-
-    const values = Object.values(chain);
-    const valuesWithTypes = [
-      'address',
-      'uint40',
-      'uint40',
-      'address',
-      'uint96',
-      'uint160',
-      'uint96',
-    ].map((type, index) => {
-      return { t: type, v: values[index] };
-    });
-
-    return web3.utils.soliditySha3(...valuesWithTypes);
+  handleGetOptionTypeHash = (option = {}) => {
+    let encoded = web3.eth.abi.encodeParameters(
+        ['address', 'uint40', 'uint40', 'address', 'uint96', 'uint160', 'uint96'],
+        Object.values(option));
+    return ethers.utils.keccak256(encoded)
   };
 
   handleGetOptionType = () => {
@@ -232,29 +183,10 @@ class NewOption extends React.Component {
       const signer = this.connection?.signer;
 
       this.contractWithSigner = contract ? contract.connect(signer) : null;
-      this.chain = this.handleGetOptionType();
+      this.optionType = this.handleGetOptionType();
 
-      const hasRequiredBalance = await this.checkIfHasRequiredBalance(
-        this.chain.underlyingAsset,
-        this.chain.underlyingAmount,
-        this.state.numberOfContracts,
-      );
-  
-      if (!hasRequiredBalance) {
-        this.setState({ writingOption: false, lowBalanceWarning: `Balance of underlying asset too low to write.` });
-        return;
-      }
-
-      // TODO(Check if a chain of this type already exists by doing a lookup)
-      this.setState({ writingOption: true }, () => {
-        this.contractWithSigner.newChain(this.chain).then(async (response) => {
-          this.contractWithSigner.on('NewChain', async (optionId) => {
-            this.optionId = optionId;
-            this.handleWriteContract();
-          });
-        }).catch((error) => {
-          console.dir(error);
-        });
+      this.setState({writingOption: true}, async () => {
+        await this.handleWriteContract();
       });
     });
   };
@@ -268,11 +200,18 @@ class NewOption extends React.Component {
       exerciseAmount,
       underlyingAsset,
       underlyingAmount,
-      lowBalanceWarning,
+      writeWarning,
+      balanceTooLow,
       needsApproval,
       writingOption,
     } = this.state;
 
+    // This should first check if the underlying asset needs approval
+    // then check if the option type exists
+    // create the new option type if it doesn't exist
+    // then write the option type
+    // TODO(Check here for assets being the same, they can't be)
+    // TODO(Check here that the dates input are valid)
     // TODO(This should ideally present the user with a few common asset/strike/expiry/exercise to write)
     // Will help liquidity fragmentation, and this present screen will be a "custom" option
     // Out of scope for MVP.
@@ -377,8 +316,8 @@ class NewOption extends React.Component {
             <Warning center>
               <p><strong>👉</strong> Valorem charges a 0.05% fee in order to exercise this option.</p>
             </Warning>
-            {lowBalanceWarning && (
-              <p className="low-balance-warning">{lowBalanceWarning}</p>
+            {writeWarning && (
+              <p className="write-warning">{writeWarning}</p>
             )}
             <Button disabled={writingOption} type="submit" theme="purple-blue">
               {writingOption ? 'Writing option...' : 'Write New Option'}
