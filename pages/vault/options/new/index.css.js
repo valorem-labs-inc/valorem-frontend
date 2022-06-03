@@ -44,7 +44,7 @@ export default styled.div`
     font-size: 20px;
   }
 
-  .low-balance-warning {
+  .write-warning {
     display: block;
     width: 100%;
     max-width: 100%;
