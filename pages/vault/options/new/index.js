@@ -37,12 +37,6 @@ class NewOption extends React.Component {
   };
 
   handleWrite = (contract = {}, optionId = "", numberOfContracts = 0) => {
-    console.log({
-      contract,
-      optionId,
-      numberOfContracts,
-    });
-
     // TODO(This should push to the option detail once it exists)
     contract.write(optionId, numberOfContracts).then((response) => {
       contract.on("OptionsWritten", (optionId, writer, claimId, amount) => {
@@ -65,8 +59,6 @@ class NewOption extends React.Component {
       this.contractWithSigner,
       this.handleGetOptionTypeHash(this.optionType)
     );
-
-    console.log(hasRequiredBalance, hasAllowance, optionId);
 
     if (!hasRequiredBalance) {
       this.setState({
@@ -130,7 +122,6 @@ class NewOption extends React.Component {
     );
 
     return approvalTransaction.wait().then((approvalResponse) => {
-      console.log({ approvalResponse });
       this.setState({ needsApproval: false }, callback);
     });
   };
@@ -163,11 +154,6 @@ class NewOption extends React.Component {
       state?.wallet?.connection?.accounts[0]
     );
     const totalUnderlyingAmount = underlyingAmount * numberOfContracts;
-
-    console.log({
-      underlyingAssetBalance,
-      totalUnderlyingAmount,
-    });
 
     return underlyingAssetBalance > totalUnderlyingAmount;
   };

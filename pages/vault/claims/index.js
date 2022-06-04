@@ -48,8 +48,6 @@ class Claims extends React.Component {
   render() {
     const { loading, claims } = this.state;
 
-    console.log({ loading, claims });
-
     // TODO(Collateral claim/redeem)
     // TODO(View option detail)
     return (

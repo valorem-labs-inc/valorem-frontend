@@ -42,7 +42,6 @@ class Options extends React.Component {
   handleFetchOptions = async (list = "active") => {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
-      console.log("wallet", state?.wallet?.connection?.accounts[0]);
       const query = {
         query: options,
         skip: !state?.wallet?.connection?.accounts[0],
@@ -52,34 +51,28 @@ class Options extends React.Component {
       };
 
       const { data } = await graphql.query(query);
-      // TODO(We need valueExact per option to know the balance the user posesses)
       const optionsData = data?.account?.ERC1155balances.filter(
-        (item) => item.token.type === 1
-      ).map((item) => item.token.option);
+        (item) => item.token.type === 1);
       const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
-
-      console.log(1);
 
       const sortedAndFormattedData = _.sortBy(
         sanitizedData,
         "expiryTimestamp"
-      )?.map((option) => {
+      )?.map((tokenData) => {
         return {
-          ...option,
+          ...tokenData,
           // TODO(In our display for unknown tokens, we should )
-          // TODO(The valueExact amount parsed above should become item.balance here)
           // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
           // TODO(Exponential notation here may be more useful than decimals?)
-          exerciseAmount: ethers.utils.formatEther(option?.exerciseAmount),
-          underlyingAmount: ethers.utils.formatEther(option?.underlyingAmount),
-          underlyingAsset: getToken(option?.underlyingAsset),
-          exerciseAsset: getToken(option?.exerciseAsset),
-          exerciseTimestamp: moment(option?.exerciseTimestamp, "X").format(),
-          expiryTimestamp: moment(option?.expiryTimestamp, "X").format(),
+          balance: tokenData?.valueExact,
+          exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
+          underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
+          underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
+          exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
+          exerciseTimestamp: moment(tokenData?.token.option.exerciseTimestamp, "X").format(),
+          expiryTimestamp: moment(tokenData?.token.option.expiryTimestamp, "X").format(),
         };
       });
-
-      console.log("sorted", sortedAndFormattedData);
 
       this.setState({
         loading: false,
