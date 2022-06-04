@@ -65,6 +65,7 @@ class Options extends React.Component {
           // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
           // TODO(Exponential notation here may be more useful than decimals?)
           balance: tokenData?.valueExact,
+          optionId: tokenData?.token.option.id,
           exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
           underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
           underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
@@ -200,7 +201,7 @@ class Options extends React.Component {
                             </h4>
                           </div>
                         </div>
-                        <Button theme="purple-blue">View Option</Button>
+                        <Button theme="purple-blue" onClick={() => Router.push(`/vault/options?option=${item?.optionId}`)}>View Option</Button>
                       </li>
                     );
                   })}
@@ -213,8 +214,9 @@ class Options extends React.Component {
           open={optionsModalOpen}
           option={option}
           onClose={() => {
-            this.setState({ optionsModalOpen: false }, () => {
+            this.setState({ optionsModalOpen: false }, async () => {
               Router.router.push("/vault/options");
+              await this.handleFetchOptions();
             });
           }}
         />
