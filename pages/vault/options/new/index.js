@@ -245,10 +245,6 @@ class NewOption extends React.Component {
       writingOption,
     } = this.state;
 
-    // This should first check if the underlying asset needs approval
-    // then check if the option type exists
-    // create the new option type if it doesn't exist
-    // then write the option type
     // TODO(Check here for assets being the same, they can't be)
     // TODO(Check here that the dates input are valid)
     // TODO(This should ideally present the user with a few common asset/strike/expiry/exercise to write)
