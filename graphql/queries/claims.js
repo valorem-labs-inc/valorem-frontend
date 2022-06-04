@@ -14,6 +14,7 @@ export const claims = gql`
           claim {
             amountWritten
             claimed
+            option
           }
         }
         valueExact
