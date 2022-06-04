@@ -5,27 +5,41 @@
   --cool-gray: #dde3ec;
   --purple-blue: #3e5dc7;
   --dark-purple: #151b50;
-  --green: #00D490;
-  --red: #EA4335;
+  --green: #00d490;
+  --red: #ea4335;
 
   /* Grays 👽 */
   --black: #111f2e;
-  --gray-800: #233747;  
-  --gray-700: #405365;  
-  --gray-600: #768592;  
-  --gray-500: #95a3ad;  
+  --gray-800: #233747;
+  --gray-700: #405365;
+  --gray-600: #768592;
+  --gray-500: #95a3ad;
   --gray-400: #d8dfe2;
-  --gray-300: #f2f2f2;  
+  --gray-300: #f2f2f2;
   --gray-200: #f8f8f8;
 
   /* Gradients */
-  --gradient-01: linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(62,93,199,1) 100%);
-  --gradient-02: linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(196,179,226,1) 100%);
-  --gradient-03: linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(221,227,236,1) 100%);
+  --gradient-01: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(62, 93, 199, 1) 100%
+  );
+  --gradient-02: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(196, 179, 226, 1) 100%
+  );
+  --gradient-03: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(221, 227, 236, 1) 100%
+  );
 
   /* Shadows */
-  --box-shadow: 0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
-  --box-shadow-light: 0 10px 15px -3px rgba(0,0,0,.03),0 4px 6px -4px rgba(0,0,0,.03);
+  --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --box-shadow-light: 0 10px 15px -3px rgba(0, 0, 0, 0.03),
+    0 4px 6px -4px rgba(0, 0, 0, 0.03);
 }
 
 html,
@@ -36,7 +50,8 @@ html > body > #__next > div {
 }
 
 body {
-  font-family: "Neue Montreal", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-family: "Neue Montreal", "Helvetica Neue", "Helvetica", "Arial",
+    sans-serif;
   background: var(--gray-200);
 }
 

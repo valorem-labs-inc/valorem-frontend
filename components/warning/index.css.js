@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   display: flex;
@@ -7,7 +7,7 @@ export default styled.div`
   background: var(--gray-300);
   border-radius: 5px;
   margin: 0px 0px 20px;
-  text-align: ${(props) => props.center ? 'center' : 'left'};
+  text-align: ${(props) => (props.center ? "center" : "left")};
 
   p {
     display: flex;

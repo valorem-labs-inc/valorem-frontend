@@ -41,25 +41,29 @@ input {
   margin-bottom: 20px;
 }
 
-::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
   color: var(--gray-400);
 }
 
-::-moz-placeholder { /* Firefox 19+ */
+::-moz-placeholder {
+  /* Firefox 19+ */
   color: var(--gray-400);
 }
 
-:-ms-input-placeholder { /* IE 10+ */
+:-ms-input-placeholder {
+  /* IE 10+ */
   color: var(--gray-400);
 }
 
-:-moz-placeholder { /* Firefox 18- */
+:-moz-placeholder {
+  /* Firefox 18- */
   color: var(--gray-400);
 }
 
 @media screen and (min-width: 1200px) {
   .form-row {
-    flex-direction: row; 
+    flex-direction: row;
   }
 
   .form-row .form-input-group {

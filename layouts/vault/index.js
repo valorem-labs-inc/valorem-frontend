@@ -1,22 +1,22 @@
-import React from 'react';
-import Link from 'next/link';
-import Router from 'next/router';
-import { connect } from 'react-redux';
-import StyledVault from './index.css.js';
-import Breadcrumbs from '../../components/breadcrumbs/index.js';
-import Button from '../../components/button/index.js';
+import React from "react";
+import Link from "next/link";
+import Router from "next/router";
+import { connect } from "react-redux";
+import StyledVault from "./index.css.js";
+import Breadcrumbs from "../../components/breadcrumbs/index.js";
+import Button from "../../components/button/index.js";
 
 class Vault extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      path: '',
+      path: "",
     };
     this.vault = React.createRef();
   }
 
   componentDidMount() {
-    document.body.classList.add('is-internal');
+    document.body.classList.add("is-internal");
 
     const { wallet } = this.props;
     const account = wallet?.connection?.accounts[0];
@@ -28,12 +28,12 @@ class Vault extends React.Component {
   }
 
   componentWillUnmount() {
-    document.body.classList.remove('is-internal');
+    document.body.classList.remove("is-internal");
   }
 
   handleDisconnectWallet = () => {
-    Router.push('/');
-  }
+    Router.push("/");
+  };
 
   render() {
     const { children } = this.props;
@@ -49,11 +49,16 @@ class Vault extends React.Component {
                   <h5>Connected As</h5>
                   <p>{account}</p>
                 </header>
-                <Button theme="purple-blue" onClick={this.handleDisconnectWallet}>Disconnect</Button>
+                <Button
+                  theme="purple-blue"
+                  onClick={this.handleDisconnectWallet}
+                >
+                  Disconnect
+                </Button>
               </div>
             </div>
             <ul>
-              <li className={path.includes('/vault/options') ? 'active' : ''}>
+              <li className={path.includes("/vault/options") ? "active" : ""}>
                 <Link href="/vault/options">Options</Link>
                 <div className="icon">
                   <i className="fas fa-link" />
@@ -63,7 +68,7 @@ class Vault extends React.Component {
                   <p>Write and manage your options.</p>
                 </header>
               </li>
-              <li className={path.includes('/vault/claims') ? 'active' : ''}>
+              <li className={path.includes("/vault/claims") ? "active" : ""}>
                 <Link href="/vault/claims">Claims</Link>
                 <div className="icon">
                   <i className="fas fa-receipt" />

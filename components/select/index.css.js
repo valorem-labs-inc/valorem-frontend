@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   position: relative;
@@ -11,7 +11,7 @@ export default styled.div`
   .select-input input {
     height: 57px;
   }
-  
+
   .select-input .selected-option {
     width: 100%;
     height: 57px;
@@ -89,7 +89,6 @@ export default styled.div`
     display: block;
     margin-right: 15px;
   }
-
 
   .select-options ul li:first-child {
     border-radius: 3px 3px 0px 0px;

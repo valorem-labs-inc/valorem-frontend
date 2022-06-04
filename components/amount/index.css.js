@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   position: relative;
@@ -19,6 +19,7 @@ export default styled.div`
   }
 
   input {
-    padding-left: ${(props) => props?.paddingLeft ? `${props.paddingLeft}` : '100px'};
+    padding-left: ${(props) =>
+      props?.paddingLeft ? `${props.paddingLeft}` : "100px"};
   }
 `;

@@ -1,9 +1,9 @@
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 export const options = gql`
   query ClaimsAndOptionsBalances($account: String) {
     account(id: $account) {
-      ERC1155balances(where: {valueExact_gt: "0"}) {
+      ERC1155balances(where: { valueExact_gt: "0" }) {
         token {
           type
           option {
@@ -28,7 +28,7 @@ export const options = gql`
       }
     }
   }
-  `;
+`;
 
 // export const activeOptions = gql`
 //   query options($where: Option_filter) {
