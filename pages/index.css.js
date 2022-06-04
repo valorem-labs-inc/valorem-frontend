@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   display: flex;
@@ -58,7 +58,6 @@ export default styled.div`
     transform: scale(1.03, 1.03);
     box-shadow: var(--box-shadow);
   }
-
 
   @media screen and (min-width: 786px) {
     padding-top: 100px;

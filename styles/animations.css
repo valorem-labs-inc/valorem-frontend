@@ -1,18 +1,18 @@
 @keyframes connect-wallet-button {
-  0%    {
+  0% {
     opacity: 1;
     transform: scale(1, 1);
     box-shadow: none;
   }
 
-  50%   {
+  50% {
     opacity: 0.95;
     background: var(--dark-purple);
     transform: scale(1.03, 1.03);
     box-shadow: var(--box-shadow);
   }
 
-  100%  {
+  100% {
     opacity: 1;
     transform: scale(1, 1);
     box-shadow: none;
@@ -25,7 +25,7 @@
     transform: scale(1, 1);
   }
 
-  100%  {
+  100% {
     opacity: 0;
     transform: scale(0, 0);
   }
@@ -37,7 +37,7 @@
     transform: scale(0, 0);
   }
 
-  100%  {
+  100% {
     opacity: 1;
     transform: scale(1, 1);
   }

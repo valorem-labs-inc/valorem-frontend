@@ -1,13 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import StyledAmount from './index.css.js';
+import StyledAmount from "./index.css.js";
 
 class Amount extends React.Component {
   state = {};
 
   render() {
-    const { id, label, paddingLeft, min, value, onChange, ...props } = this.props;
+    const { id, label, paddingLeft, min, value, onChange, ...props } =
+      this.props;
     return (
       <StyledAmount paddingLeft={paddingLeft}>
         <div className="input-cap">{label}</div>

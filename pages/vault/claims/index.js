@@ -1,17 +1,17 @@
-import Router from 'next/router';
-import React from 'react';
-import { connect } from 'react-redux';
-import Link from 'next/link';
-import Button from '../../../components/button';
-import Vault from '../../../layouts/vault';
-import Loader from '../../../components/loader';
-import BlankState from '../../../components/blankState';
-import store from '../../../lib/store';
-import graphql from '../../../graphql/client';
-import { claims as claimsQuery } from '../../../graphql/queries/claims';
-import unfreezeApolloCacheValue from '../../../lib/unfreezeApolloCacheValue';
+import Router from "next/router";
+import React from "react";
+import { connect } from "react-redux";
+import Link from "next/link";
+import Button from "../../../components/button";
+import Vault from "../../../layouts/vault";
+import Loader from "../../../components/loader";
+import BlankState from "../../../components/blankState";
+import store from "../../../lib/store";
+import graphql from "../../../graphql/client";
+import { claims as claimsQuery } from "../../../graphql/queries/claims";
+import unfreezeApolloCacheValue from "../../../lib/unfreezeApolloCacheValue";
 
-import StyledClaims from './index.css.js';
+import StyledClaims from "./index.css.js";
 
 class Claims extends React.Component {
   state = {
@@ -30,12 +30,14 @@ class Claims extends React.Component {
         query: claimsQuery,
         skip: !state?.wallet?.connection?.accounts[0],
         variables: {
-          account: state?.wallet?.connection?.accounts[0].toLowerCase()
+          account: state?.wallet?.connection?.accounts[0].toLowerCase(),
         },
       });
-      const claims = data?.account?.ERC1155balances.filter(item => item.token.type === 2)
+      const claims = data?.account?.ERC1155balances.filter(
+        (item) => item.token.type === 2
+      );
       const sanitizedData = unfreezeApolloCacheValue(claims || []);
-  
+
       this.setState({
         loading: false,
         claims: sanitizedData,
@@ -78,10 +80,25 @@ class Claims extends React.Component {
                     {claims?.map((item, index) => {
                       return (
                         <tr key={`claim-${item}-${index}`}>
-                          <td className="text-center"><Link href={`/vault/options?option=${item?.option}`}>View Option</Link></td>
-                          <td className="text-center">{item?.token?.claim?.amountWritten || 0}</td>
                           <td className="text-center">
-                            <Button disabled={item?.token?.claim?.claimed} theme="purple-blue">{ item?.token?.claim?.claimed ? 'Claimed' : 'Claim'}</Button>
+                            <Link
+                              href={`/vault/options?option=${item?.option}`}
+                            >
+                              View Option
+                            </Link>
+                          </td>
+                          <td className="text-center">
+                            {item?.token?.claim?.amountWritten || 0}
+                          </td>
+                          <td className="text-center">
+                            <Button
+                              disabled={item?.token?.claim?.claimed}
+                              theme="purple-blue"
+                            >
+                              {item?.token?.claim?.claimed
+                                ? "Claimed"
+                                : "Claim"}
+                            </Button>
                           </td>
                         </tr>
                       );
@@ -104,5 +121,3 @@ Claims.propTypes = {
 export default connect((state) => {
   return state;
 })(Claims);
-
-

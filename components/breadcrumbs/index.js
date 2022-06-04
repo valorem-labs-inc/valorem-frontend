@@ -1,24 +1,29 @@
-import React from 'react';
-import Router from 'next/router';
-import PropTypes from 'prop-types';
-import Link from 'next/link';
+import React from "react";
+import Router from "next/router";
+import PropTypes from "prop-types";
+import Link from "next/link";
 
-import StyledBreadcrumbs from './index.css.js';
+import StyledBreadcrumbs from "./index.css.js";
 
 class Breadcrumbs extends React.Component {
   state = {
-    breadcrumbs: []
+    breadcrumbs: [],
   };
 
   componentDidMount() {
-    const pathParts = Router.asPath?.split('/').filter((part) => part?.trim() !== '');
+    const pathParts = Router.asPath
+      ?.split("/")
+      .filter((part) => part?.trim() !== "");
     this.setState({
       path: Router.asPath,
       breadcrumbs: pathParts?.map((part, partIndex) => {
         const previousParts = pathParts.slice(0, partIndex);
         return {
-          label: part?.split('?').shift(),
-          href: previousParts?.length > 0 ? `/${previousParts?.join('/')}/${part}`.split('?').shift() : `/${part}`.split('?').shift(),
+          label: part?.split("?").shift(),
+          href:
+            previousParts?.length > 0
+              ? `/${previousParts?.join("/")}/${part}`.split("?").shift()
+              : `/${part}`.split("?").shift(),
         };
       }),
     });
@@ -33,10 +38,15 @@ class Breadcrumbs extends React.Component {
           <ul>
             {breadcrumbs?.map((breadcrumb, breadcrumbIndex) => {
               return (
-                <li key={breadcrumb?.href} className={breadcrumbIndex + 1 === breadcrumbs?.length ? 'active' : ''}>
+                <li
+                  key={breadcrumb?.href}
+                  className={
+                    breadcrumbIndex + 1 === breadcrumbs?.length ? "active" : ""
+                  }
+                >
                   <Link href={breadcrumb?.href}>{breadcrumb?.label}</Link>
                 </li>
-              )
+              );
             })}
           </ul>
         )}

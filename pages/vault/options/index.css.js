@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   header {
@@ -139,7 +139,7 @@ export default styled.div`
     color: var(--gray-600);
     text-shadow: 0px 1px 1px var(--white);
   }
-  
+
   .options ul li .option-row h4 {
     font-size: 20px;
     color: var(--purple-blue);

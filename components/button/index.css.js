@@ -1,26 +1,26 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-const getTheme = (theme = 'purple-blue', target = 'background') => {
+const getTheme = (theme = "purple-blue", target = "background") => {
   const matchingTheme = {
-    'muted-purple': {
+    "muted-purple": {
       background: `var(--muted-purple)`,
       color: `var(--white)`,
     },
-    'cool-gray': {
+    "cool-gray": {
       background: `var(--cool-gray)`,
       color: `var(--black)`,
     },
-    'purple-blue': {
+    "purple-blue": {
       background: `var(--purple-blue)`,
       color: `var(--white)`,
     },
-    'dark-purple': {
+    "dark-purple": {
       background: `var(--dark-purple)`,
       color: `var(--white)`,
     },
   }[theme];
 
-  return matchingTheme && matchingTheme[target] || `#fff`;
+  return (matchingTheme && matchingTheme[target]) || `#fff`;
 };
 
 export default styled.button`
@@ -35,8 +35,8 @@ export default styled.button`
 
   ${(props) => {
     return `
-      background: ${getTheme(props?.theme, 'background')};
-      color: ${getTheme(props?.theme, 'color')};
+      background: ${getTheme(props?.theme, "background")};
+      color: ${getTheme(props?.theme, "color")};
     `;
   }}
 

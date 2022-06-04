@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export default styled.div`
   background: #fff;
@@ -42,7 +42,7 @@ export default styled.div`
     color: var(--gray-600);
     text-shadow: 0px 1px 1px var(--white);
   }
-  
+
   .option-row h4 {
     font-size: 20px;
     color: var(--purple-blue);
@@ -113,7 +113,7 @@ export default styled.div`
 
 export const OptionModalBackdrop = styled.div`
   position: fixed;
-  display: ${(props) => props.open ? 'flex' : 'none'};
+  display: ${(props) => (props.open ? "flex" : "none")};
   justify-content: center;
   top: 0px;
   right: 0px;
@@ -124,6 +124,6 @@ export const OptionModalBackdrop = styled.div`
   padding: 0px 20px;
 
   .option-modal {
-    display: ${(props) => props.open ? 'block' : 'none'} !important;
+    display: ${(props) => (props.open ? "block" : "none")} !important;
   }
 `;

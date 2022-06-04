@@ -1,20 +1,20 @@
-import React from 'react';
-import Head from 'next/head';
-import Router from 'next/router';
-import { Provider as ReduxProvider } from 'react-redux';
-import store from '../lib/store';
+import React from "react";
+import Head from "next/head";
+import Router from "next/router";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "../lib/store";
 
 import "react-datetime/css/react-datetime.css";
 
-import '../styles/reset.css';
-import '../styles/fonts.css';
-import '../styles/global.css';
-import '../styles/helpers.css';
-import '../styles/forms.css';
-import '../styles/tables.css';
-import '../styles/animations.css';
+import "../styles/reset.css";
+import "../styles/fonts.css";
+import "../styles/global.css";
+import "../styles/helpers.css";
+import "../styles/forms.css";
+import "../styles/tables.css";
+import "../styles/animations.css";
 
-import StyledApp from './_app.css.js';
+import StyledApp from "./_app.css.js";
 
 class App extends React.Component {
   state = {};
@@ -23,7 +23,7 @@ class App extends React.Component {
     const state = store.getState();
 
     if (!state.wallet) {
-      Router.push('/');
+      Router.push("/");
     }
   }
 

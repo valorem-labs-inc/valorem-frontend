@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import StyledBlankState from './index.css';
+import StyledBlankState from "./index.css";
 
 class BlankState extends React.Component {
   state = {};

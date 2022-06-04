@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import StyledLayout from './layout.css.js';
+import StyledLayout from "./layout.css.js";
 
 class Layout extends React.Component {
   state = {};
@@ -11,7 +11,9 @@ class Layout extends React.Component {
     return (
       <StyledLayout>
         <nav>
-          <a className="logo" href="/"><img src="/logo.png" alt="Valorem" /></a>
+          <a className="logo" href="/">
+            <img src="/logo.png" alt="Valorem" />
+          </a>
         </nav>
         {children}
       </StyledLayout>

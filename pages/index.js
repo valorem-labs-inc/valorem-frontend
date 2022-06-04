@@ -1,11 +1,11 @@
-import Router from 'next/router';
-import React from 'react';
-import { connect } from 'react-redux';
-import Button from '../components/button';
-import connectWallet from '../lib/connectWallet';
-import store from '../lib/store';
+import Router from "next/router";
+import React from "react";
+import { connect } from "react-redux";
+import Button from "../components/button";
+import connectWallet from "../lib/connectWallet";
+import store from "../lib/store";
 
-import StyledIndex from './index.css.js';
+import StyledIndex from "./index.css.js";
 
 class Index extends React.Component {
   constructor(props) {
@@ -19,7 +19,7 @@ class Index extends React.Component {
     this.index = React.createRef();
   }
 
-  isCorrectNetwork = (network = '') => {
+  isCorrectNetwork = (network = "") => {
     const expectedChainId = {
       development: 4,
       production: 1,
@@ -35,28 +35,31 @@ class Index extends React.Component {
       try {
         this.wallet = await connectWallet();
         if (this.isCorrectNetwork(this.wallet?.connection?.network)) {
-          dispatch({ type: 'CONNECT_WALLET', wallet: this.wallet });
+          dispatch({ type: "CONNECT_WALLET", wallet: this.wallet });
 
           // NOTE: Animate fade out of page and after 1s (animation length), redirect to vault.
-          this.index.current.classList.add('fade-out');
-          setTimeout(() => Router.push('/vault/options'), 500);
+          this.index.current.classList.add("fade-out");
+          setTimeout(() => Router.push("/vault/options"), 500);
         } else {
           const networkName = {
-            development: 'Rinkeby Test Network',
-            production: 'Ethereum Mainnet',
+            development: "Rinkeby Test Network",
+            production: "Ethereum Mainnet",
           }[process.env.NODE_ENV];
 
-          this.setState({
-            connectingWallet: false,
-            walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
-          }, () => {
-            dispatch({
-              type: 'DISCONNECT_WALLET',
-              wallet: null,
-            });
-  
-            Router.push('/');
-          });
+          this.setState(
+            {
+              connectingWallet: false,
+              walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
+            },
+            () => {
+              dispatch({
+                type: "DISCONNECT_WALLET",
+                wallet: null,
+              });
+
+              Router.push("/");
+            }
+          );
         }
       } catch (exception) {
         this.setState({ connectingWallet: false });
@@ -76,10 +79,17 @@ class Index extends React.Component {
           onClick={this.handleConnectWallet}
           theme="purple-blue"
         >
-          {connectingWallet ? 'Connecting...' : 'Connect Wallet'}
+          {connectingWallet ? "Connecting..." : "Connect Wallet"}
         </Button>
-        {walletError && <p className="wallet-error"><strong>Error:</strong> {walletError}</p>}
-        <p>Connected wallet data is <em>only</em> stored in your browser — Valorem does not store this information.</p>
+        {walletError && (
+          <p className="wallet-error">
+            <strong>Error:</strong> {walletError}
+          </p>
+        )}
+        <p>
+          Connected wallet data is <em>only</em> stored in your browser —
+          Valorem does not store this information.
+        </p>
       </StyledIndex>
     );
   }
