@@ -63,7 +63,6 @@ class Index extends React.Component {
         }
       } catch (exception) {
         this.setState({ connectingWallet: false });
-        console.log(exception);
       }
     });
   };
