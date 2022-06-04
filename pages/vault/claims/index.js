@@ -38,8 +38,6 @@ class Claims extends React.Component {
       );
       const sanitizedData = unfreezeApolloCacheValue(claims || []);
 
-      console.log(sanitizedData)
-
       this.setState({
         loading: false,
         claims: sanitizedData,
