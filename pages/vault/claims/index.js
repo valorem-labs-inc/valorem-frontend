@@ -49,6 +49,8 @@ class Claims extends React.Component {
     const { loading, claims } = this.state;
 
     // TODO(Collateral claim/redeem)
+    // TODO(These are only claimable after expiry)
+    // If the token is unclaimed and not yet expired, the user should see a grey claim button
     // TODO(View option detail)
     return (
       <Vault>
@@ -71,7 +73,7 @@ class Claims extends React.Component {
                     <tr>
                       <th className="text-center">Option Details</th>
                       <th className="text-center">Contracts Written</th>
-                      <th className="text-center">Claim Collateral</th>
+                      <th className="text-center">Redeem</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -80,7 +82,7 @@ class Claims extends React.Component {
                         <tr key={`claim-${item}-${index}`}>
                           <td className="text-center">
                             <Link
-                              href={`/vault/options?option=${item?.option}`}
+                              href={`/vault/options?option=${item?.token?.claim?.option}`}
                             >
                               View Option
                             </Link>
