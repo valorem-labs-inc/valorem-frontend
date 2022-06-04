@@ -36,7 +36,7 @@ class Options extends React.Component {
       });
     }
 
-    this.handleFetchOptions();
+    await this.handleFetchOptions();
   }
 
   handleFetchOptions = async (list = "active") => {
