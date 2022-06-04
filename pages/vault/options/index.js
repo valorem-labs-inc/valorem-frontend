@@ -8,7 +8,7 @@ import Vault from "../../../layouts/vault";
 import Button from "../../../components/button";
 import OptionModal from "../../../components/optionModal";
 import Loader from "../../../components/loader";
-import { options } from "../../../graphql/queries/options";
+import { options as optionsQuery } from "../../../graphql/queries/options";
 import store from "../../../lib/store";
 import graphql from "../../../graphql/client";
 import unfreezeApolloCacheValue from "../../../lib/unfreezeApolloCacheValue";
@@ -43,7 +43,7 @@ class Options extends React.Component {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
       const query = {
-        query: options,
+        query: optionsQuery,
         skip: !state?.wallet?.connection?.accounts[0],
         variables: {
           account: state?.wallet?.connection?.accounts[0].toLowerCase(),
@@ -156,7 +156,7 @@ class Options extends React.Component {
                       >
                         <div className="option-row">
                           <div className="option-datapoint">
-                            <h5>Contracts</h5>
+                            <h5>Balance</h5>
                             <h4>{item?.balance || 0}</h4>
                           </div>
                         </div>

@@ -3,13 +3,54 @@ import moment from "moment";
 import Button from "../button";
 import Warning from "../warning";
 import getToken from "../../lib/getToken";
-
 import StyledOptionModal, { OptionModalBackdrop } from "./index.css.js";
+import store from "../../lib/store";
+import graphql from "../../graphql/client";
+import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
+import { ethers } from "ethers";
+import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
 
 class OptionModal extends React.Component {
-  state = {};
+  state = {
+    loading: false,
+    optionData: null,
+  };
+
+  async componentDidMount() {
+    await this.handleFetchOptionDetails();
+  }
+
+  handleFetchOptionDetails = async () => {
+    this.setState({ loading: true }, async () => {
+      const state = store.getState();
+      let optionId = null;
+      if (this.props?.option) {
+        optionId = ethers.BigNumber.from(this.props?.option)._hex;
+      }
+      const query = {
+        query: optionDetailsQuery,
+        skip: !state?.wallet?.connection?.accounts[0] || !optionId,
+        variables: {
+          account: state?.wallet?.connection?.accounts[0].toLowerCase(),
+          token: optionId,
+        },
+      };
+
+      const { data } = await graphql.query(query);
+      const optionsData = data?.account?.ERC1155balances.filter(
+        (item) => item.token.type === 1
+      );
+      const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
+
+      this.setState({
+        loading: false,
+        options: sanitizedData,
+      });
+    });
+  };
 
   render() {
+    // TODO(On close this should push back to a page)
     const { open, hide, onClose, onApprove } = this.props;
     const {
       numberOfContracts,
