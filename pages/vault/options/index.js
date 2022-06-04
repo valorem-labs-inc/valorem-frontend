@@ -52,6 +52,7 @@ class Options extends React.Component {
       };
 
       const { data } = await graphql.query(query);
+      // TODO(We need valueExact per option to know the balance the user posesses)
       const optionsData = data?.account?.ERC1155balances.filter(
         (item) => item.token.type === 1
       ).map((item) => item.token.option);
@@ -65,14 +66,11 @@ class Options extends React.Component {
       )?.map((option) => {
         return {
           ...option,
-          exerciseAmount: parseInt(
-            ethers.utils.formatEther(option?.exerciseAmount),
-            10
-          ),
-          underlyingAmount: parseInt(
-            ethers.utils.formatEther(option?.underlyingAmount),
-            10
-          ),
+          // TODO(The valueExact amount parsed above should become item.balance here)
+          // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
+          // TODO(Exponential notation here may be more useful than decimals?)
+          exerciseAmount: ethers.utils.formatEther(option?.exerciseAmount),
+          underlyingAmount: ethers.utils.formatEther(option?.underlyingAmount),
           underlyingAsset: getToken(option?.underlyingAsset),
           exerciseAsset: getToken(option?.exerciseAsset),
           exerciseTimestamp: moment(option?.exerciseTimestamp, "X").format(),
@@ -165,12 +163,12 @@ class Options extends React.Component {
                         <div className="option-row">
                           <div className="option-datapoint">
                             <h5>Contracts</h5>
-                            <h4>{item?.amount || 0}</h4>
+                            <h4>{item?.balance || 0}</h4>
                           </div>
                         </div>
                         <div className="option-row">
                           <div className="option-datapoint">
-                            <h5>Exercise From</h5>
+                            <h5>Exercise Date</h5>
                             <h4>
                               {moment(item?.exerciseTimestamp).format(
                                 "MMM Do, YYYY"
@@ -178,7 +176,7 @@ class Options extends React.Component {
                             </h4>
                           </div>
                           <div className="option-datapoint">
-                            <h5>Expiration Date</h5>
+                            <h5>Expiry Date</h5>
                             <h4>
                               {moment(item?.expiryTimestamp).format(
                                 "MMM Do, YYYY"
@@ -188,23 +186,23 @@ class Options extends React.Component {
                         </div>
                         <div className="option-row">
                           <div className="option-datapoint">
-                            <h5>Underlying Asset</h5>
+                            <h5>Underlying Asset Amount</h5>
                             <h4>
                               {item?.underlyingAmount > 0
                                 ? item?.underlyingAmount
                                 : "~"}{" "}
                               {item?.underlyingAsset?.symbol}{" "}
-                              <span>(x {item?.amount || 0})</span>
+                              <span>(x {item?.balance || 0})</span>
                             </h4>
                           </div>
                           <div className="option-datapoint">
-                            <h5>Exercise Asset</h5>
+                            <h5>Exercise Asset Amount</h5>
                             <h4>
                               {item?.exerciseAmount > 0
                                 ? item?.exerciseAmount
                                 : "~"}{" "}
                               {item?.exerciseAsset?.symbol}{" "}
-                              <span>(x {item?.amount || 0})</span>
+                              <span>(x {item?.balance || 0})</span>
                             </h4>
                           </div>
                         </div>
