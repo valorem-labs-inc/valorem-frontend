@@ -66,6 +66,7 @@ class Options extends React.Component {
       )?.map((option) => {
         return {
           ...option,
+          // TODO(In our display for unknown tokens, we should )
           // TODO(The valueExact amount parsed above should become item.balance here)
           // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
           // TODO(Exponential notation here may be more useful than decimals?)
