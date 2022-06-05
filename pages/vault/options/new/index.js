@@ -20,7 +20,7 @@ const MAX_APPROVAL =
 
 class NewOption extends React.Component {
   state = {
-    numberOfContracts: 0,
+    balance: 0,
     exerciseTimestamp: "",
     expiryTimestamp: "",
     exerciseAsset: "",
@@ -49,7 +49,7 @@ class NewOption extends React.Component {
     const hasRequiredBalance = await this.checkIfHasRequiredBalance(
       this.optionType.underlyingAsset,
       this.optionType.underlyingAmount,
-      this.state.numberOfContracts
+      this.state.balance
     );
     const hasAllowance = await this.checkIfHasAllowance(
       this.state?.underlyingAsset,
@@ -86,7 +86,7 @@ class NewOption extends React.Component {
               this.handleWrite(
                 this.contractWithSigner,
                 optionId,
-                ethers.BigNumber.from(this.state.numberOfContracts)
+                ethers.BigNumber.from(this.state.balance)
               );
             });
           });
@@ -94,7 +94,7 @@ class NewOption extends React.Component {
         this.handleWrite(
           this.contractWithSigner,
           optionId,
-          ethers.BigNumber.from(this.state.numberOfContracts)
+          ethers.BigNumber.from(this.state.balance)
         );
       }
     }
@@ -219,7 +219,7 @@ class NewOption extends React.Component {
 
   render() {
     const {
-      numberOfContracts,
+      balance,
       exerciseTimestamp,
       expiryTimestamp,
       exerciseAsset,
@@ -250,7 +250,7 @@ class NewOption extends React.Component {
                   <Amount
                     label="#"
                     paddingLeft="65px"
-                    value={numberOfContracts}
+                    value={balance}
                     onChange={(event) => {
                       this.setState({ numberOfContracts: event.target.value });
                     }}
@@ -354,7 +354,7 @@ class NewOption extends React.Component {
           open={!!needsApproval}
           needsApproval={needsApproval}
           option={{
-            numberOfContracts,
+            numberOfContracts: balance,
             exerciseTimestamp,
             expiryTimestamp,
             underlyingAsset,
@@ -367,7 +367,7 @@ class NewOption extends React.Component {
             this.handleApproveToken(
               underlyingAsset,
               underlyingAmount,
-              numberOfContracts,
+              balance,
               () => {
                 this.handleWriteContract();
               }

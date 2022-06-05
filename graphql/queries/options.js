@@ -29,3 +29,25 @@ export const options = gql`
     }
   }
 `;
+
+export const optionDetails = gql`
+  query OptionDetails($account: String, $token: String) {
+    erc1155Balances(where: { account: $account, token: $token }) {
+      valueExact
+      token {
+        identifier
+        option {
+          exerciseAsset {
+            id
+          }
+          exerciseTimestamp
+          expiryTimestamp
+          underlyingAmount
+          underlyingAsset {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
