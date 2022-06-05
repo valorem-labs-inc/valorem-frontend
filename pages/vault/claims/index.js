@@ -73,7 +73,7 @@ class Claims extends React.Component {
                     <tr>
                       <th className="text-center">Option Details</th>
                       <th className="text-center">Contracts Written</th>
-                      <th className="text-center">Redeem</th>
+                      <th className="text-center">Details</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -94,11 +94,7 @@ class Claims extends React.Component {
                             <Button
                               disabled={item?.token?.claim?.claimed}
                               theme="purple-blue"
-                            >
-                              {item?.token?.claim?.claimed
-                                ? "Claimed"
-                                : "Claim"}
-                            </Button>
+                            >View Claim</Button>
                           </td>
                         </tr>
                       );

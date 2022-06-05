@@ -40,7 +40,7 @@ class NewOption extends React.Component {
     // TODO(This should push to the option detail once it exists)
     contract.write(optionId, numberOfContracts).then((response) => {
       contract.on("OptionsWritten", (optionId, writer, claimId, amount) => {
-        Router.push("/vault/options");
+        Router.push(`/vault/options?option=${optionId}`);
       });
     });
   };
@@ -240,19 +240,19 @@ class NewOption extends React.Component {
       <Vault>
         <StyledNewOption>
           <header>
-            <h4>Write New Option</h4>
+            <h4>Write Option</h4>
           </header>
           <form disabled={writingOption} onSubmit={this.handleWriteOption}>
             <div className="contract-options">
               <div className="form-row">
                 <div className="form-input-group">
-                  <label htmlFor="numberOfContracts">Number of Contracts</label>
+                  <label htmlFor="balance">Number of Contracts</label>
                   <Amount
                     label="#"
                     paddingLeft="65px"
                     value={balance}
                     onChange={(event) => {
-                      this.setState({ numberOfContracts: event.target.value });
+                      this.setState({ balance: event.target.value });
                     }}
                   />
                 </div>
@@ -354,7 +354,7 @@ class NewOption extends React.Component {
           open={!!needsApproval}
           needsApproval={needsApproval}
           option={{
-            numberOfContracts: balance,
+            balance,
             exerciseTimestamp,
             expiryTimestamp,
             underlyingAsset,
@@ -363,14 +363,14 @@ class NewOption extends React.Component {
             exerciseAsset,
             needsApproval,
           }}
-          onApprove={() => {
-            this.handleApproveToken(
-              underlyingAsset,
-              underlyingAmount,
-              balance,
-              () => {
-                this.handleWriteContract();
-              }
+          onApprove={async () => {
+            await this.handleApproveToken(
+                underlyingAsset,
+                underlyingAmount,
+                balance,
+                async () => {
+                  await this.handleWriteContract();
+                }
             );
           }}
         />

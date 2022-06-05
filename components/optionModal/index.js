@@ -115,8 +115,7 @@ class OptionModal extends React.Component {
                   <p>
                     Approval to withdraw from your account is required in order
                     to write this option. Click "Approve{" "}
-                    {underlyingAssetToken?.symbol}" below to complete the
-                    transaction.
+                    {underlyingAsset.symbol}" below to complete the transaction.
                   </p>
                 </Warning>
               )}
@@ -126,7 +125,7 @@ class OptionModal extends React.Component {
                   theme="purple-blue"
                   onClick={onApprove}
                 >
-                  Approve {underlyingAssetToken?.symbol} &amp; Write Options
+                  Approve {underlyingAsset.symbol} &amp; Write Options
                 </Button>
               )}
               {!needsApproval && (
