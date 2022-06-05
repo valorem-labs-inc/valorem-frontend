@@ -9,6 +9,7 @@ import graphql from "../../graphql/client";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
 import { ethers } from "ethers";
 import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
+import Router from "next/router";
 
 class OptionModal extends React.Component {
   state = {
@@ -18,7 +19,6 @@ class OptionModal extends React.Component {
 
   // TODO(Figure out how to trigger this, or otherwise get the data when coming here from an href with the option id)
   handleFetchOptionDetails = async () => {
-    const state = store.getState();
     let optionId = this.props.option;
     if (optionId)
       this.setState({ loading: true }, async () => {
@@ -50,6 +50,11 @@ class OptionModal extends React.Component {
       });
   };
 
+  handleExerciseOption = async () => {
+    const state = store.getState();
+    // TODO(Handle exercise)
+  };
+
   render() {
     const { open, hide, onClose, onApprove } = this.props;
     // TODO(on this conditional we should used detail data returned from a query)
@@ -64,6 +69,7 @@ class OptionModal extends React.Component {
       needsApproval,
     } = this.props?.option || {};
 
+    // TODO(The exercise button should be disabled if the timestamp is incorrect)
     return (
       <>
         <OptionModalBackdrop open={open}>
@@ -129,7 +135,12 @@ class OptionModal extends React.Component {
                 </Button>
               )}
               {!needsApproval && (
-                <Button disabled theme="purple-blue">
+                <Button
+                  theme="purple-blue"
+                  onClick={async () => {
+                    await this.handleExerciseOption().then(onClose());
+                  }}
+                >
                   Exercise Option
                 </Button>
               )}

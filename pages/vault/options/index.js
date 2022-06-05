@@ -39,6 +39,8 @@ class Options extends React.Component {
     await this.handleFetchOptions();
   }
 
+  // TODO(This should also reload on fresh page loads)
+
   handleFetchOptions = async () => {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
