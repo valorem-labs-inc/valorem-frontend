@@ -94,12 +94,13 @@ class Options extends React.Component {
     });
   };
 
-  handleOpenOptionModal = () => {
-    this.setState({ optionsModalOpen: true });
+  handleOpenOptionModal = (optionData) => {
+    this.setState({ optionsModalOpen: true, option: optionData});
+    Router.push(`/vault/options?option=${optionData.optionId}`);
   };
 
   render() {
-    const { list, optionsModalOpen, option, loading, options } = this.state;
+    const { list, optionsModalOpen, loading, options } = this.state;
 
     return (
       <>
@@ -207,7 +208,7 @@ class Options extends React.Component {
                             </h4>
                           </div>
                         </div>
-                        <Button theme="purple-blue" onClick={() => Router.push(`/vault/options?option=${item?.optionId}`)}>View Option</Button>
+                        <Button theme="purple-blue" onClick={() => this.handleOpenOptionModal(item)}>View Option</Button>
                       </li>
                     );
                   })}
@@ -218,7 +219,7 @@ class Options extends React.Component {
         </Vault>
         <OptionModal
           open={optionsModalOpen}
-          option={option}
+          option={this.state.option}
           onClose={() => {
             this.setState({ optionsModalOpen: false }, async () => {
               await Router.router.push("/vault/options");

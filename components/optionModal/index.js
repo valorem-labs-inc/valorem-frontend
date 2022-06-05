@@ -12,48 +12,49 @@ import { optionDetails as optionDetailsQuery } from "../../graphql/queries/optio
 
 class OptionModal extends React.Component {
   state = {
-    loading: true,
+    loading: false,
     optionData: null,
   };
 
-  async componentDidMount() {
-    console.log("did mount");
-    await this.handleFetchOptionDetails();
-  }
-
+  // TODO(Figure out how to trigger this, or otherwise get the data when coming here from an href with the option id)
   handleFetchOptionDetails = async () => {
     const state = store.getState();
     let optionId = this.props.option;
-    console.log(optionId);
-    if (optionId) {
-      const contractAddress =
-        state?.wallet?.connection?.optionsSettlementEngineAddress;
-      const tokenId = ethers.BigNumber.from(this.props?.option)._hex;
-      optionId = `${contractAddress}/${tokenId}`;
-      const query = {
-        query: optionDetailsQuery,
-        skip: !state?.wallet?.connection?.accounts[0],
-        variables: {
-          account: state?.wallet?.connection?.accounts[0].toLowerCase(),
-          token: optionId,
-        },
-      };
+    if (optionId)
+      this.setState({ loading: true }, async () => {
+        console.log("getting detail");
+        const state = store.getState();
+        let optionId = null;
+        const contractAddress =
+          state?.wallet?.connection?.optionsSettlementEngineAddress;
+        if (this.props?.option) {
+          const tokenId = ethers.BigNumber.from(this.props?.option)._hex;
+          optionId = `${contractAddress}/${tokenId}`;
+        }
+        const query = {
+          query: optionDetailsQuery,
+          skip: !state?.wallet?.connection?.accounts[0] || !optionId,
+          variables: {
+            account: state?.wallet?.connection?.accounts[0].toLowerCase(),
+            token: optionId,
+          },
+        };
 
-      const { data } = await graphql.query(query);
-      const sanitizedData = unfreezeApolloCacheValue(data || []);
+        const { data } = await graphql.query(query);
+        const sanitizedData = unfreezeApolloCacheValue(data || []);
 
-      this.setState({
-        loading: false,
-        options: sanitizedData,
+        this.setState({
+          loading: false,
+          options: sanitizedData,
+        });
       });
-    }
   };
 
   render() {
     const { open, hide, onClose, onApprove } = this.props;
-    console.log(this.props);
+    // TODO(on this conditional we should used detail data returned from a query)
     const {
-      numberOfContracts,
+      balance,
       exerciseTimestamp,
       expiryTimestamp,
       underlyingAsset,
@@ -63,11 +64,6 @@ class OptionModal extends React.Component {
       needsApproval,
     } = this.props?.option || {};
 
-    const underlyingAssetToken = underlyingAsset
-      ? getToken(underlyingAsset)
-      : null;
-    const exerciseAssetToken = exerciseAsset ? getToken(exerciseAsset) : null;
-
     return (
       <>
         <OptionModalBackdrop open={open}>
@@ -76,32 +72,32 @@ class OptionModal extends React.Component {
             <div className="option-row">
               <div className="option-datapoint">
                 <h5>Balance</h5>
-                <h4>{numberOfContracts}</h4>
+                <h4>{balance}</h4>
               </div>
             </div>
             <div className="option-row">
               <div className="option-datapoint">
-                <h5>Exercise From</h5>
+                <h5>Exercise Date</h5>
                 <h4>{moment(exerciseTimestamp).format("MMM Do, YYYY")}</h4>
               </div>
               <div className="option-datapoint">
-                <h5>Expiration Date</h5>
+                <h5>Expiry Date</h5>
                 <h4>{moment(expiryTimestamp).format("MMM Do, YYYY")}</h4>
               </div>
             </div>
             <div className="option-row">
               <div className="option-datapoint">
-                <h5>Underlying Asset</h5>
+                <h5>Underlying Asset Amount</h5>
                 <h4>
-                  {underlyingAmount} {underlyingAssetToken?.symbol}{" "}
-                  <span>(x {numberOfContracts})</span>
+                  {underlyingAmount} {underlyingAsset?.symbol}{" "}
+                  <span>(x {balance})</span>
                 </h4>
               </div>
               <div className="option-datapoint">
-                <h5>Exercise Asset</h5>
+                <h5>Exercise Asset Amount</h5>
                 <h4>
-                  {exerciseAmount} {exerciseAssetToken?.symbol}{" "}
-                  <span>(x {numberOfContracts})</span>
+                  {exerciseAmount} {exerciseAsset?.symbol}{" "}
+                  <span>(x {balance})</span>
                 </h4>
               </div>
             </div>
