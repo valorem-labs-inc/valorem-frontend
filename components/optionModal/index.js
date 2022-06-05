@@ -2,14 +2,12 @@ import React from "react";
 import moment from "moment";
 import Button from "../button";
 import Warning from "../warning";
-import getToken from "../../lib/getToken";
 import StyledOptionModal, { OptionModalBackdrop } from "./index.css.js";
 import store from "../../lib/store";
 import graphql from "../../graphql/client";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
 import { ethers } from "ethers";
 import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
-import Router from "next/router";
 
 class OptionModal extends React.Component {
   state = {
@@ -69,7 +67,10 @@ class OptionModal extends React.Component {
       needsApproval,
     } = this.props?.option || {};
 
-    // TODO(The exercise button should be disabled if the timestamp is incorrect)
+    // TODO(The exercise button should be disabled if the present timestamp is incorrect)
+    // TODO(The exercise button should be disabled if the balance is 0)
+    // TODO(The exercise button should fail/be disabled if the user's balance of the exercise asset is too low)
+    // TODO(The exercise button should be an approval button if the user needs to approve the exercise asset)
     return (
       <>
         <OptionModalBackdrop open={open}>
