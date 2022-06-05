@@ -12,24 +12,27 @@ import { optionDetails as optionDetailsQuery } from "../../graphql/queries/optio
 
 class OptionModal extends React.Component {
   state = {
-    loading: false,
+    loading: true,
     optionData: null,
   };
 
   async componentDidMount() {
+    console.log("did mount");
     await this.handleFetchOptionDetails();
   }
 
   handleFetchOptionDetails = async () => {
-    this.setState({ loading: true }, async () => {
-      const state = store.getState();
-      let optionId = null;
-      if (this.props?.option) {
-        optionId = ethers.BigNumber.from(this.props?.option)._hex;
-      }
+    const state = store.getState();
+    let optionId = this.props.option;
+    console.log(optionId);
+    if (optionId) {
+      const contractAddress =
+        state?.wallet?.connection?.optionsSettlementEngineAddress;
+      const tokenId = ethers.BigNumber.from(this.props?.option)._hex;
+      optionId = `${contractAddress}/${tokenId}`;
       const query = {
         query: optionDetailsQuery,
-        skip: !state?.wallet?.connection?.accounts[0] || !optionId,
+        skip: !state?.wallet?.connection?.accounts[0],
         variables: {
           account: state?.wallet?.connection?.accounts[0].toLowerCase(),
           token: optionId,
@@ -37,21 +40,18 @@ class OptionModal extends React.Component {
       };
 
       const { data } = await graphql.query(query);
-      const optionsData = data?.account?.ERC1155balances.filter(
-        (item) => item.token.type === 1
-      );
-      const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
+      const sanitizedData = unfreezeApolloCacheValue(data || []);
 
       this.setState({
         loading: false,
         options: sanitizedData,
       });
-    });
+    }
   };
 
   render() {
-    // TODO(On close this should push back to a page)
     const { open, hide, onClose, onApprove } = this.props;
+    console.log(this.props);
     const {
       numberOfContracts,
       exerciseTimestamp,
@@ -75,7 +75,7 @@ class OptionModal extends React.Component {
             {hide && <i className="fas fa-xmark" onClick={onClose} />}
             <div className="option-row">
               <div className="option-datapoint">
-                <h5>Contracts</h5>
+                <h5>Balance</h5>
                 <h4>{numberOfContracts}</h4>
               </div>
             </div>

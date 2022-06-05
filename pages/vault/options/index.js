@@ -39,52 +39,58 @@ class Options extends React.Component {
     await this.handleFetchOptions();
   }
 
-  handleFetchOptions = async (list = "active") => {
+  handleFetchOptions = async () => {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
-      const query = {
-        query: optionsQuery,
-        skip: !state?.wallet?.connection?.accounts[0],
-        variables: {
-          account: state?.wallet?.connection?.accounts[0].toLowerCase(),
-        },
-      };
 
-      const { data } = await graphql.query(query);
-      const optionsData = data?.account?.ERC1155balances.filter(
-        (item) => item.token.type === 1);
-      const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
-
-      const sortedAndFormattedData = _.sortBy(
-        sanitizedData,
-        "expiryTimestamp"
-      )?.map((tokenData) => {
-        return {
-          ...tokenData,
-          // TODO(In our display for unknown tokens, we should )
-          // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
-          // TODO(Exponential notation here may be more useful than decimals?)
-          balance: tokenData?.valueExact,
-          optionId: tokenData?.token.option.id,
-          exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
-          underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
-          underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
-          exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
-          exerciseTimestamp: moment(tokenData?.token.option.exerciseTimestamp, "X").format(),
-          expiryTimestamp: moment(tokenData?.token.option.expiryTimestamp, "X").format(),
+      const userAccount = state?.wallet?.connection?.accounts[0].toLowerCase();
+      // TODO(Why doesn't skip work here?)
+      if (userAccount) {
+        const query = {
+          query: optionsQuery,
+          variables: {
+            account: userAccount,
+          },
         };
-      });
 
-      this.setState({
-        loading: false,
-        options: sortedAndFormattedData,
-      });
+        const { data } = await graphql.query(query);
+        // TODO(Filter acive/inactive)
+        const optionsData = data?.account?.ERC1155balances.filter(
+            (item) => item.token.type === 1);
+        const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
+
+        const sortedAndFormattedData = _.sortBy(
+            sanitizedData,
+            "expiryTimestamp"
+        )?.map((tokenData) => {
+          return {
+            ...tokenData,
+            // TODO(In our display for unknown tokens, we should )
+            // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
+            // TODO(Exponential notation here may be more useful than decimals?)
+            balance: tokenData?.valueExact,
+            optionId: tokenData?.token.option.id,
+            exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
+            underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
+            underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
+            exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
+            exerciseTimestamp: moment(tokenData?.token.option.exerciseTimestamp, "X").format(),
+            expiryTimestamp: moment(tokenData?.token.option.expiryTimestamp, "X").format(),
+          };
+        });
+
+        this.setState({
+          loading: false,
+          options: sortedAndFormattedData,
+        });
+      }
     });
   };
 
   handleSetList = (list = "active") => {
-    this.setState({ list }, () => {
-      this.handleFetchOptions(list);
+    this.setState({ list }, async () => {
+      this.state.list = list;
+      await this.handleFetchOptions();
     });
   };
 
@@ -146,10 +152,10 @@ class Options extends React.Component {
             {!loading && options?.length > 0 && (
               <div className="options">
                 <ul>
-                  {options?.map((item, itemIndex) => {
+                  {options?.map((item) => {
                     return (
                       <li
-                        key={`item-${item?.id}`}
+                        key={`item-${item?.optionId}`}
                         className={`option ${
                           list === "expired" ? "expired" : ""
                         }`}
@@ -215,7 +221,8 @@ class Options extends React.Component {
           option={option}
           onClose={() => {
             this.setState({ optionsModalOpen: false }, async () => {
-              Router.router.push("/vault/options");
+              await Router.router.push("/vault/options");
+              // To make sure the options are (re)loaded closing the modal
               await this.handleFetchOptions();
             });
           }}
