@@ -6,7 +6,7 @@ import StyledOptionModal, { OptionModalBackdrop } from "./index.css.js";
 import store from "../../lib/store";
 import graphql from "../../graphql/client";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
 
 class OptionModal extends React.Component {
@@ -51,6 +51,14 @@ class OptionModal extends React.Component {
   handleExerciseOption = async () => {
     const state = store.getState();
     // TODO(Handle exercise)
+
+    const connection = state?.wallet?.connection;
+    const { contract, signer } = connection;
+    const { optionId } = this.props.option;
+
+    console.log(this.props.option);
+
+    await contract.connect(signer).exercise(optionId, 1);
   };
 
   render() {

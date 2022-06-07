@@ -58,12 +58,13 @@ class Options extends React.Component {
         const { data } = await graphql.query(query);
         // TODO(Filter acive/inactive)
         const optionsData = data?.account?.ERC1155balances.filter(
-            (item) => item.token.type === 1);
+          (item) => item.token.type === 1
+        );
         const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
 
         const sortedAndFormattedData = _.sortBy(
-            sanitizedData,
-            "expiryTimestamp"
+          sanitizedData,
+          "expiryTimestamp"
         )?.map((tokenData) => {
           return {
             ...tokenData,
@@ -72,12 +73,22 @@ class Options extends React.Component {
             // TODO(Exponential notation here may be more useful than decimals?)
             balance: tokenData?.valueExact,
             optionId: tokenData?.token.option.id,
-            exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
-            underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
+            exerciseAmount: ethers.utils.formatEther(
+              tokenData?.token.option.exerciseAmount
+            ),
+            underlyingAmount: ethers.utils.formatEther(
+              tokenData?.token.option.underlyingAmount
+            ),
             underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
             exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
-            exerciseTimestamp: moment(tokenData?.token.option.exerciseTimestamp, "X").format(),
-            expiryTimestamp: moment(tokenData?.token.option.expiryTimestamp, "X").format(),
+            exerciseTimestamp: moment(
+              tokenData?.token.option.exerciseTimestamp,
+              "X"
+            ).format(),
+            expiryTimestamp: moment(
+              tokenData?.token.option.expiryTimestamp,
+              "X"
+            ).format(),
           };
         });
 
@@ -97,7 +108,7 @@ class Options extends React.Component {
   };
 
   handleOpenOptionModal = (optionData) => {
-    this.setState({ optionsModalOpen: true, option: optionData});
+    this.setState({ optionsModalOpen: true, option: optionData });
     Router.push(`/vault/options?option=${optionData.optionId}`);
   };
 
@@ -210,7 +221,12 @@ class Options extends React.Component {
                             </h4>
                           </div>
                         </div>
-                        <Button theme="purple-blue" onClick={() => this.handleOpenOptionModal(item)}>View Option</Button>
+                        <Button
+                          theme="purple-blue"
+                          onClick={() => this.handleOpenOptionModal(item)}
+                        >
+                          View Option
+                        </Button>
                       </li>
                     );
                   })}

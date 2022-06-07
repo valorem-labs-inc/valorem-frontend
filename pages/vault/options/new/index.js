@@ -9,7 +9,11 @@ import Button from "../../../../components/button";
 import Warning from "../../../../components/warning";
 import TokenSelect from "../../../../components/tokenSelect";
 import OptionModal from "../../../../components/optionModal";
-import {checkIfHasRequiredBalance, checkIfHasAllowance} from "../../../../lib/utilities";
+import {
+  checkIfHasRequiredBalance,
+  checkIfHasAllowance,
+  handleApproveToken,
+} from "../../../../lib/utilities";
 import store from "../../../../lib/store";
 
 import StyledNewOption from "./index.css.js";
@@ -52,9 +56,7 @@ class NewOption extends React.Component {
       this.optionType.underlyingAmount,
       this.state.balance
     );
-    const hasAllowance = await checkIfHasAllowance(
-      this.state?.underlyingAsset,
-    );
+    const hasAllowance = await checkIfHasAllowance(this.state?.underlyingAsset);
     let optionId = await this.handleGetOptionTypeId(
       this.contractWithSigner,
       this.handleGetOptionTypeHash(this.optionType)
@@ -99,8 +101,6 @@ class NewOption extends React.Component {
       }
     }
   };
-
-
 
   handleGetOptionTypeId = async (contractWithSigner = {}, chainHash = "") => {
     try {
@@ -308,14 +308,9 @@ class NewOption extends React.Component {
             needsApproval,
           }}
           onApprove={async () => {
-            await this.handleApproveToken(
-                underlyingAsset,
-                underlyingAmount,
-                balance,
-                async () => {
-                  await this.handleWriteContract();
-                }
-            );
+            await handleApproveToken(underlyingAsset, () => {
+              this.setState({ needsApproval: false }, this.handleWriteContract);
+            });
           }}
         />
       </Vault>
