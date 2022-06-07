@@ -29,42 +29,43 @@ class Index extends React.Component {
   };
 
   handleConnectWallet = () => {
-    const { dispatch } = this.props;
+    this.props.connectWallet();
+    // const { dispatch } = this.props;
 
-    this.setState({ connectingWallet: true, walletError: null }, async () => {
-      try {
-        this.wallet = await connectWallet();
-        if (this.isCorrectNetwork(this.wallet?.connection?.network)) {
-          dispatch({ type: "CONNECT_WALLET", wallet: this.wallet });
+    // this.setState({ connectingWallet: true, walletError: null }, async () => {
+    //   try {
+    //     this.wallet = await connectWallet();
+    //     if (this.isCorrectNetwork(this.wallet?.connection?.network)) {
+    //       dispatch({ type: "CONNECT_WALLET", wallet: this.wallet });
 
-          // NOTE: Animate fade out of page and after 1s (animation length), redirect to vault.
-          this.index.current.classList.add("fade-out");
-          setTimeout(() => Router.push("/vault/options"), 500);
-        } else {
-          const networkName = {
-            development: "Rinkeby Test Network",
-            production: "Ethereum Mainnet",
-          }[process.env.NODE_ENV];
+    //       // NOTE: Animate fade out of page and after 1s (animation length), redirect to vault.
+    //       this.index.current.classList.add("fade-out");
+    //       setTimeout(() => Router.push("/vault/options"), 500);
+    //     } else {
+    //       const networkName = {
+    //         development: "Rinkeby Test Network",
+    //         production: "Ethereum Mainnet",
+    //       }[process.env.NODE_ENV];
 
-          this.setState(
-            {
-              connectingWallet: false,
-              walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
-            },
-            () => {
-              dispatch({
-                type: "DISCONNECT_WALLET",
-                wallet: null,
-              });
+    //       this.setState(
+    //         {
+    //           connectingWallet: false,
+    //           walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
+    //         },
+    //         () => {
+    //           dispatch({
+    //             type: "DISCONNECT_WALLET",
+    //             wallet: null,
+    //           });
 
-              Router.push("/");
-            }
-          );
-        }
-      } catch (exception) {
-        this.setState({ connectingWallet: false });
-      }
-    });
+    //           Router.push("/");
+    //         }
+    //       );
+    //     }
+    //   } catch (exception) {
+    //     this.setState({ connectingWallet: false });
+    //   }
+    // });
   };
 
   render() {
