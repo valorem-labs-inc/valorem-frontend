@@ -29,40 +29,17 @@ class Index extends React.Component {
   };
 
   handleConnectWallet = () => {
-    // this.props.connectWallet();
     const { connectWallet, dispatch } = this.props;
 
     this.setState({ connectingWallet: true, walletError: null }, async () => {
       try {
-        await connectWallet();
+        const success = await connectWallet();
 
-        const state = store.getState();
-        const { wallet } = state;
-
-        if (this.isCorrectNetwork(wallet.connection.network)) {
-          dispatch({ type: "CONNECT_WALLET", wallet: wallet });
-          // NOTE: Animate fade out of page and after 1s (animation length), redirect to vault.
+        if (success) {
           this.index.current.classList.add("fade-out");
           setTimeout(() => Router.push("/vault/options"), 500);
         } else {
-          const networkName = {
-            development: "Rinkeby Test Network",
-            production: "Ethereum Mainnet",
-          }[process.env.NODE_ENV];
-
-          this.setState(
-            {
-              connectingWallet: false,
-              walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
-            },
-            () => {
-              dispatch({
-                type: "DISCONNECT_WALLET",
-                wallet: null,
-              });
-              Router.push("/");
-            }
-          );
+          this.setState({ connectingWallet: false });
         }
       } catch (exception) {
         this.setState({ connectingWallet: false });

@@ -70,17 +70,15 @@ class App extends React.Component {
       }
     });
 
-    provider.on("disconnect", () => {
-      console.log("DISCONNECTED");
-    });
-
     if (this.isCorrectNetwork(connection.network)) {
       this.handleCorrectNetwork(wallet);
+      this.setState({ ready: true });
+      return true;
     } else {
       this.handleIncorrectNetwork();
+      this.setState({ ready: true });
+      return false;
     }
-
-    this.setState({ ready: true });
   };
 
   isCorrectNetwork = (network = "") => {
