@@ -20,9 +20,6 @@ import "../styles/tables.css";
 import "../styles/animations.css";
 
 import StyledApp from "./_app.css.js";
-import { chain } from "lodash";
-
-function installMetamask() {}
 
 class App extends React.Component {
   state = {
