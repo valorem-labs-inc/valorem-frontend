@@ -3,6 +3,7 @@ import Head from "next/head";
 import Router from "next/router";
 import { Provider as ReduxProvider } from "react-redux";
 import Web3Modal from "web3modal";
+import { providers } from "web3modal";
 
 import store from "../lib/store";
 import walletProviderOptions from "../lib/walletProviderOptions";
@@ -21,12 +22,29 @@ import "../styles/animations.css";
 import StyledApp from "./_app.css.js";
 import { chain } from "lodash";
 
+function installMetamask() {}
+
 class App extends React.Component {
   state = {
     ready: false,
   };
 
   componentDidMount() {
+    if (!(window.web3 || window.ethereum)) {
+      walletProviderOptions["custom-metamask"] = {
+        display: {
+          logo: providers.METAMASK.logo,
+          name: "Install MetaMask",
+          description: "Connect using browser wallet",
+        },
+        package: {},
+        connector: async () => {
+          window.open("https://metamask.io");
+          throw new Error("MetaMask not installed");
+        },
+      };
+    }
+
     this.web3Modal = new Web3Modal({
       network: process.env.NODE_ENV === "development" ? "rinkeby" : "mainnet",
       providerOptions: walletProviderOptions,
