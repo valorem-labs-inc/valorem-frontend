@@ -19,9 +19,12 @@ import "../styles/tables.css";
 import "../styles/animations.css";
 
 import StyledApp from "./_app.css.js";
+import { chain } from "lodash";
 
 class App extends React.Component {
-  state = {};
+  state = {
+    ready: false,
+  };
 
   componentDidMount() {
     this.web3Modal = new Web3Modal({
@@ -38,11 +41,14 @@ class App extends React.Component {
       if (!state.wallet) {
         Router.push("/");
       }
+
+      this.setState({ ready: true });
     }
   }
 
   connectWallet = async () => {
     const provider = await this.web3Modal.connect();
+
     const connection = await getWalletConnection(provider);
 
     const wallet = {
@@ -51,11 +57,61 @@ class App extends React.Component {
       web3Modal: this.web3Modal,
     };
 
+    provider.removeAllListeners();
+
+    // Subscribe to chainId change
+    provider.on("chainChanged", (chainId) => {
+      console.log("chainChanged");
+
+      const correctNetwork = this.isCorrectNetwork(parseInt(chainId));
+
+      if (!correctNetwork) {
+        this.handleIncorrectNetwork();
+      }
+    });
+
+    provider.on("disconnect", () => {
+      console.log("DISCONNECTED");
+    });
+
+    if (this.isCorrectNetwork(connection.network)) {
+      this.handleCorrectNetwork(wallet);
+    } else {
+      this.handleIncorrectNetwork();
+    }
+
+    this.setState({ ready: true });
+  };
+
+  isCorrectNetwork = (network = "") => {
+    const expectedChainId = {
+      development: 4,
+      production: 1,
+    }[process.env.NODE_ENV];
+
+    return expectedChainId === network?.chainId;
+  };
+
+  handleCorrectNetwork = (wallet) => {
     store.dispatch({ type: "CONNECT_WALLET", wallet: wallet });
 
     if (Router.route == "/") {
       Router.push("/vault/options");
     }
+  };
+
+  handleIncorrectNetwork = () => {
+    const networkName = {
+      development: "Rinkeby Test Network",
+      production: "Ethereum Mainnet",
+    }[process.env.NODE_ENV];
+
+    store.dispatch({
+      type: "DISCONNECT_WALLET",
+      walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
+    });
+
+    Router.push("/");
   };
 
   year = () => {
@@ -76,12 +132,18 @@ class App extends React.Component {
         <Head>
           <title>Valorem Options</title>
         </Head>
-        <ReduxProvider store={store}>
-          <Component connectWallet={this.connectWallet} {...pageProps} />
-        </ReduxProvider>
-        <footer>
-          <p>&copy; {this.year()}, Valorem Labs Inc. All rights reserved.</p>
-        </footer>
+        {this.state.ready && (
+          <>
+            <ReduxProvider store={store}>
+              <Component connectWallet={this.connectWallet} {...pageProps} />
+            </ReduxProvider>
+            <footer>
+              <p>
+                &copy; {this.year()}, Valorem Labs Inc. All rights reserved.
+              </p>
+            </footer>
+          </>
+        )}
       </StyledApp>
     );
   }
