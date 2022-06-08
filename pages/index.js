@@ -2,9 +2,6 @@ import Router from "next/router";
 import React from "react";
 import { connect } from "react-redux";
 import Button from "../components/button";
-import connectWallet from "../lib/connectWallet";
-import store from "../lib/store";
-
 import StyledIndex from "./index.css.js";
 
 class Index extends React.Component {
@@ -13,25 +10,15 @@ class Index extends React.Component {
 
     this.state = {
       connectingWallet: false,
-      walletError: null,
     };
 
     this.index = React.createRef();
   }
 
-  isCorrectNetwork = (network = "") => {
-    const expectedChainId = {
-      development: 4,
-      production: 1,
-    }[process.env.NODE_ENV];
-
-    return expectedChainId === network?.chainId;
-  };
-
   handleConnectWallet = () => {
-    const { connectWallet, dispatch } = this.props;
+    const { connectWallet } = this.props;
 
-    this.setState({ connectingWallet: true, walletError: null }, async () => {
+    this.setState({ connectingWallet: true }, async () => {
       try {
         const success = await connectWallet();
 
