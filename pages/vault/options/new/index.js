@@ -9,6 +9,11 @@ import Button from "../../../../components/button";
 import Warning from "../../../../components/warning";
 import TokenSelect from "../../../../components/tokenSelect";
 import OptionModal from "../../../../components/optionModal";
+import {
+  checkIfHasRequiredBalance,
+  checkIfHasAllowance,
+  handleApproveToken,
+} from "../../../../lib/utilities";
 import store from "../../../../lib/store";
 
 import StyledNewOption from "./index.css.js";
@@ -46,15 +51,12 @@ class NewOption extends React.Component {
   };
 
   handleWriteContract = async () => {
-    const hasRequiredBalance = await this.checkIfHasRequiredBalance(
+    const hasRequiredBalance = await checkIfHasRequiredBalance(
       this.optionType.underlyingAsset,
       this.optionType.underlyingAmount,
       this.state.balance
     );
-    const hasAllowance = await this.checkIfHasAllowance(
-      this.state?.underlyingAsset,
-      this.connection?.optionsSettlementEngineAddress
-    );
+    const hasAllowance = await checkIfHasAllowance(this.state?.underlyingAsset);
     let optionId = await this.handleGetOptionTypeId(
       this.contractWithSigner,
       this.handleGetOptionTypeHash(this.optionType)
@@ -98,64 +100,6 @@ class NewOption extends React.Component {
         );
       }
     }
-  };
-
-  handleApproveToken = async (
-    underlyingAsset = "",
-    underlyingAmount = 0,
-    numberOfContracts = 0,
-    callback = null
-  ) => {
-    const state = store.getState();
-    const erc20 = state?.wallet?.connection?.erc20;
-    const optionsSettlementEngineAddress =
-      state?.wallet?.connection?.optionsSettlementEngineAddress;
-    const erc20Instance = erc20(underlyingAsset);
-    const erc20InstanceWithSigner = erc20Instance
-      ? erc20Instance.connect(this.connection.signer)
-      : null;
-    const approvalTransaction = await erc20InstanceWithSigner.approve(
-      optionsSettlementEngineAddress,
-      // NOTE: Parse Ether to WEI before performing approval.
-      MAX_APPROVAL
-      // ethers.utils.parseEther(`${underlyingAmount * numberOfContracts}`)
-    );
-
-    return approvalTransaction.wait().then((approvalResponse) => {
-      this.setState({ needsApproval: false }, callback);
-    });
-  };
-
-  checkIfHasAllowance = async (
-    underlyingAsset = "",
-    optionsSettlementEngineAddress = ""
-  ) => {
-    const state = store.getState();
-    const erc20 = state?.wallet?.connection?.erc20;
-    const erc20Instance = erc20(underlyingAsset);
-    const allowanceResponse = await erc20Instance.allowance(
-      state?.wallet?.connection?.accounts[0],
-      optionsSettlementEngineAddress
-    );
-
-    // TODO(This should check not just that it's gt 0, but greater than the actual amount required)
-    return allowanceResponse?._hex !== "0x00";
-  };
-
-  checkIfHasRequiredBalance = async (
-    underlyingAsset,
-    underlyingAmount,
-    numberOfContracts
-  ) => {
-    const state = store.getState();
-    const erc20 = state?.wallet?.connection?.erc20;
-    const erc20Instance = erc20(underlyingAsset);
-    const underlyingAssetBalance = await erc20Instance.balanceOf(
-      state?.wallet?.connection?.accounts[0]
-    );
-    const totalUnderlyingAmount = underlyingAmount * numberOfContracts;
-
-    return underlyingAssetBalance > totalUnderlyingAmount;
   };
 
   handleGetOptionTypeId = async (contractWithSigner = {}, chainHash = "") => {
@@ -364,14 +308,9 @@ class NewOption extends React.Component {
             needsApproval,
           }}
           onApprove={async () => {
-            await this.handleApproveToken(
-                underlyingAsset,
-                underlyingAmount,
-                balance,
-                async () => {
-                  await this.handleWriteContract();
-                }
-            );
+            await handleApproveToken(underlyingAsset, () => {
+              this.setState({ needsApproval: false }, this.handleWriteContract);
+            });
           }}
         />
       </Vault>

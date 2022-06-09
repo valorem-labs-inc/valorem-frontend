@@ -2,12 +2,11 @@ import React from "react";
 import moment from "moment";
 import Button from "../button";
 import Warning from "../warning";
-import getToken from "../../lib/getToken";
 import StyledOptionModal, { OptionModalBackdrop } from "./index.css.js";
 import store from "../../lib/store";
 import graphql from "../../graphql/client";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
 
 class OptionModal extends React.Component {
@@ -18,7 +17,6 @@ class OptionModal extends React.Component {
 
   // TODO(Figure out how to trigger this, or otherwise get the data when coming here from an href with the option id)
   handleFetchOptionDetails = async () => {
-    const state = store.getState();
     let optionId = this.props.option;
     if (optionId)
       this.setState({ loading: true }, async () => {
@@ -50,11 +48,26 @@ class OptionModal extends React.Component {
       });
   };
 
+  canExercise = async () => {
+    return false;
+  };
+
+  handleExerciseOption = async () => {
+    const state = store.getState();
+
+    const connection = state?.wallet?.connection;
+    const { contract, signer } = connection;
+    const { balance, optionId } = this.props.option;
+
+    await contract.connect(signer).exercise(optionId, balance);
+  };
+
   render() {
     const { open, hide, onClose, onApprove } = this.props;
     // TODO(on this conditional we should used detail data returned from a query)
     const {
       balance,
+      canExercise,
       exerciseTimestamp,
       expiryTimestamp,
       underlyingAsset,
@@ -64,6 +77,10 @@ class OptionModal extends React.Component {
       needsApproval,
     } = this.props?.option || {};
 
+    // TODO(The exercise button should be disabled if the present timestamp is incorrect)
+    // TODO(The exercise button should be disabled if the balance is 0)
+    // TODO(The exercise button should fail/be disabled if the user's balance of the exercise asset is too low)
+    // TODO(The exercise button should be an approval button if the user needs to approve the exercise asset)
     return (
       <>
         <OptionModalBackdrop open={open}>
@@ -129,7 +146,13 @@ class OptionModal extends React.Component {
                 </Button>
               )}
               {!needsApproval && (
-                <Button disabled theme="purple-blue">
+                <Button
+                  disabled={!canExercise}
+                  theme="purple-blue"
+                  onClick={async () => {
+                    await this.handleExerciseOption().then(onClose());
+                  }}
+                >
                   Exercise Option
                 </Button>
               )}

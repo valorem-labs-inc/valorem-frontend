@@ -13,7 +13,7 @@ import store from "../../../lib/store";
 import graphql from "../../../graphql/client";
 import unfreezeApolloCacheValue from "../../../lib/unfreezeApolloCacheValue";
 import getToken from "../../../lib/getToken";
-
+import erc20ABI from "../../../lib/abis/erc20";
 import StyledOptions from "./index.css.js";
 import BlankState from "../../../components/blankState";
 
@@ -39,6 +39,8 @@ class Options extends React.Component {
     await this.handleFetchOptions();
   }
 
+  // TODO(This should also reload on fresh page loads)
+
   handleFetchOptions = async () => {
     this.setState({ loading: true }, async () => {
       const state = store.getState();
@@ -56,26 +58,82 @@ class Options extends React.Component {
         const { data } = await graphql.query(query);
         // TODO(Filter acive/inactive)
         const optionsData = data?.account?.ERC1155balances.filter(
-            (item) => item.token.type === 1);
+          (item) => item.token.type === 1
+        );
+
         const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
 
+        const tokenBalances = {};
+
+        for (const { token } of sanitizedData) {
+          const tokenAddress = token.option.exerciseAsset.id;
+
+          if (tokenBalances[tokenAddress]) {
+            continue;
+          }
+
+          const erc20Token = new ethers.Contract(
+            tokenAddress,
+            erc20ABI,
+            state.wallet.connection.signer
+          );
+
+          const balance = await erc20Token.balanceOf(userAccount);
+
+          tokenBalances[tokenAddress] = balance;
+        }
+
+        const now = moment();
+
         const sortedAndFormattedData = _.sortBy(
-            sanitizedData,
-            "expiryTimestamp"
+          sanitizedData,
+          "expiryTimestamp"
         )?.map((tokenData) => {
+          const exerciseDate = moment(
+            tokenData?.token.option.exerciseTimestamp,
+            "X"
+          );
+
+          const expiryDate = moment(
+            tokenData?.token.option.expiryTimestamp,
+            "X"
+          );
+
+          let canExercise = true;
+          if (
+            tokenBalances[tokenData?.token.option.exerciseAsset.id].lt(
+              tokenData?.token.option.exerciseAmount
+            )
+          ) {
+            canExercise = false;
+          }
+
+          if (now.isBefore(exerciseDate)) {
+            canExercise = false;
+          }
+
+          if (now.isAfter(expiryDate)) {
+            canExercise = false;
+          }
+
           return {
             ...tokenData,
             // TODO(In our display for unknown tokens, we should )
             // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
             // TODO(Exponential notation here may be more useful than decimals?)
             balance: tokenData?.valueExact,
+            canExercise,
             optionId: tokenData?.token.option.id,
-            exerciseAmount: ethers.utils.formatEther(tokenData?.token.option.exerciseAmount),
-            underlyingAmount: ethers.utils.formatEther(tokenData?.token.option.underlyingAmount),
+            exerciseAmount: ethers.utils.formatEther(
+              tokenData?.token.option.exerciseAmount
+            ),
+            underlyingAmount: ethers.utils.formatEther(
+              tokenData?.token.option.underlyingAmount
+            ),
             underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
             exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
-            exerciseTimestamp: moment(tokenData?.token.option.exerciseTimestamp, "X").format(),
-            expiryTimestamp: moment(tokenData?.token.option.expiryTimestamp, "X").format(),
+            exerciseTimestamp: exerciseDate.format(),
+            expiryTimestamp: expiryDate.format(),
           };
         });
 
@@ -95,7 +153,7 @@ class Options extends React.Component {
   };
 
   handleOpenOptionModal = (optionData) => {
-    this.setState({ optionsModalOpen: true, option: optionData});
+    this.setState({ optionsModalOpen: true, option: optionData });
     Router.push(`/vault/options?option=${optionData.optionId}`);
   };
 
@@ -208,7 +266,12 @@ class Options extends React.Component {
                             </h4>
                           </div>
                         </div>
-                        <Button theme="purple-blue" onClick={() => this.handleOpenOptionModal(item)}>View Option</Button>
+                        <Button
+                          theme="purple-blue"
+                          onClick={() => this.handleOpenOptionModal(item)}
+                        >
+                          View Option
+                        </Button>
                       </li>
                     );
                   })}
