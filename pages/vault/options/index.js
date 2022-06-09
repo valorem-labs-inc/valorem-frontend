@@ -13,7 +13,7 @@ import store from "../../../lib/store";
 import graphql from "../../../graphql/client";
 import unfreezeApolloCacheValue from "../../../lib/unfreezeApolloCacheValue";
 import getToken from "../../../lib/getToken";
-
+import erc20ABI from "../../../lib/abis/erc20";
 import StyledOptions from "./index.css.js";
 import BlankState from "../../../components/blankState";
 
@@ -60,18 +60,49 @@ class Options extends React.Component {
         const optionsData = data?.account?.ERC1155balances.filter(
           (item) => item.token.type === 1
         );
+
         const sanitizedData = unfreezeApolloCacheValue(optionsData || []);
+
+        const tokenBalances = {};
+
+        for (const { token } of sanitizedData) {
+          const tokenAddress = token.option.exerciseAsset.id;
+
+          if (tokenBalances[tokenAddress]) {
+            continue;
+          }
+
+          const erc20Token = new ethers.Contract(
+            tokenAddress,
+            erc20ABI,
+            state.wallet.connection.signer
+          );
+
+          const balance = await erc20Token.balanceOf(userAccount);
+
+          tokenBalances[tokenAddress] = balance;
+        }
 
         const sortedAndFormattedData = _.sortBy(
           sanitizedData,
           "expiryTimestamp"
         )?.map((tokenData) => {
+          let canExercise = true;
+          if (
+            tokenBalances[tokenData?.token.option.exerciseAsset.id].lt(
+              tokenData?.token.option.exerciseAmount
+            )
+          ) {
+            canExercise = false;
+          }
+
           return {
             ...tokenData,
             // TODO(In our display for unknown tokens, we should )
             // TODO(These decimals should be taken from the ERC20 contract for non standard tokens to display correctly)
             // TODO(Exponential notation here may be more useful than decimals?)
             balance: tokenData?.valueExact,
+            canExercise,
             optionId: tokenData?.token.option.id,
             exerciseAmount: ethers.utils.formatEther(
               tokenData?.token.option.exerciseAmount

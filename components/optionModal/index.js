@@ -48,6 +48,10 @@ class OptionModal extends React.Component {
       });
   };
 
+  canExercise = async () => {
+    return false;
+  };
+
   handleExerciseOption = async () => {
     const state = store.getState();
 
@@ -63,6 +67,7 @@ class OptionModal extends React.Component {
     // TODO(on this conditional we should used detail data returned from a query)
     const {
       balance,
+      canExercise,
       exerciseTimestamp,
       expiryTimestamp,
       underlyingAsset,
@@ -142,6 +147,7 @@ class OptionModal extends React.Component {
               )}
               {!needsApproval && (
                 <Button
+                  disabled={!canExercise}
                   theme="purple-blue"
                   onClick={async () => {
                     await this.handleExerciseOption().then(onClose());
