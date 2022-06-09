@@ -104,6 +104,12 @@ class Options extends React.Component {
             canExercise = false;
           }
 
+          if (
+            now.isAfter(moment(tokenData?.token.option.expiryTimestamp, "X"))
+          ) {
+            canExercise = false;
+          }
+
           return {
             ...tokenData,
             // TODO(In our display for unknown tokens, we should )
