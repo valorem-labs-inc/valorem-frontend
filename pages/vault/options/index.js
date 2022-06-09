@@ -83,6 +83,8 @@ class Options extends React.Component {
           tokenBalances[tokenAddress] = balance;
         }
 
+        const now = moment();
+
         const sortedAndFormattedData = _.sortBy(
           sanitizedData,
           "expiryTimestamp"
@@ -92,6 +94,12 @@ class Options extends React.Component {
             tokenBalances[tokenData?.token.option.exerciseAsset.id].lt(
               tokenData?.token.option.exerciseAmount
             )
+          ) {
+            canExercise = false;
+          }
+
+          if (
+            now.isBefore(moment(tokenData?.token.option.exerciseTimestamp, "X"))
           ) {
             canExercise = false;
           }
