@@ -2,9 +2,6 @@ import Router from "next/router";
 import React from "react";
 import { connect } from "react-redux";
 import Button from "../components/button";
-import connectWallet from "../lib/connectWallet";
-import store from "../lib/store";
-
 import StyledIndex from "./index.css.js";
 
 class Index extends React.Component {
@@ -13,53 +10,23 @@ class Index extends React.Component {
 
     this.state = {
       connectingWallet: false,
-      walletError: null,
     };
 
     this.index = React.createRef();
   }
 
-  isCorrectNetwork = (network = "") => {
-    const expectedChainId = {
-      development: 4,
-      production: 1,
-    }[process.env.NODE_ENV];
-
-    return expectedChainId === network?.chainId;
-  };
-
   handleConnectWallet = () => {
-    const { dispatch } = this.props;
+    const { connectWallet } = this.props;
 
-    this.setState({ connectingWallet: true, walletError: null }, async () => {
+    this.setState({ connectingWallet: true }, async () => {
       try {
-        this.wallet = await connectWallet();
-        if (this.isCorrectNetwork(this.wallet?.connection?.network)) {
-          dispatch({ type: "CONNECT_WALLET", wallet: this.wallet });
+        const success = await connectWallet();
 
-          // NOTE: Animate fade out of page and after 1s (animation length), redirect to vault.
+        if (success) {
           this.index.current.classList.add("fade-out");
           setTimeout(() => Router.push("/vault/options"), 500);
         } else {
-          const networkName = {
-            development: "Rinkeby Test Network",
-            production: "Ethereum Mainnet",
-          }[process.env.NODE_ENV];
-
-          this.setState(
-            {
-              connectingWallet: false,
-              walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
-            },
-            () => {
-              dispatch({
-                type: "DISCONNECT_WALLET",
-                wallet: null,
-              });
-
-              Router.push("/");
-            }
-          );
+          this.setState({ connectingWallet: false });
         }
       } catch (exception) {
         this.setState({ connectingWallet: false });
@@ -68,7 +35,8 @@ class Index extends React.Component {
   };
 
   render() {
-    const { connectingWallet, walletError } = this.state;
+    const { connectingWallet } = this.state;
+    const { walletError } = this.props;
 
     return (
       <StyledIndex ref={this.index}>
@@ -96,4 +64,8 @@ class Index extends React.Component {
 
 Index.propTypes = {};
 
-export default connect()(Index);
+const mapStateToProps = (state) => {
+  return { walletError: state.walletError };
+};
+
+export default connect(mapStateToProps)(Index);
