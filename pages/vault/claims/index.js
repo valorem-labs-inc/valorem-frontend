@@ -94,7 +94,9 @@ class Claims extends React.Component {
                             <Button
                               disabled={item?.token?.claim?.claimed}
                               theme="purple-blue"
-                            >View Claim</Button>
+                            >
+                              View Claim
+                            </Button>
                           </td>
                         </tr>
                       );
