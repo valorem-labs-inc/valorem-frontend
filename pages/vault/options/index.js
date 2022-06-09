@@ -89,6 +89,16 @@ class Options extends React.Component {
           sanitizedData,
           "expiryTimestamp"
         )?.map((tokenData) => {
+          const exerciseDate = moment(
+            tokenData?.token.option.exerciseTimestamp,
+            "X"
+          );
+
+          const expiryDate = moment(
+            tokenData?.token.option.expiryTimestamp,
+            "X"
+          );
+
           let canExercise = true;
           if (
             tokenBalances[tokenData?.token.option.exerciseAsset.id].lt(
@@ -98,15 +108,11 @@ class Options extends React.Component {
             canExercise = false;
           }
 
-          if (
-            now.isBefore(moment(tokenData?.token.option.exerciseTimestamp, "X"))
-          ) {
+          if (now.isBefore(exerciseDate)) {
             canExercise = false;
           }
 
-          if (
-            now.isAfter(moment(tokenData?.token.option.expiryTimestamp, "X"))
-          ) {
+          if (now.isAfter(expiryDate)) {
             canExercise = false;
           }
 
@@ -126,14 +132,8 @@ class Options extends React.Component {
             ),
             underlyingAsset: getToken(tokenData?.token.option.underlyingAsset),
             exerciseAsset: getToken(tokenData?.token.option.exerciseAsset),
-            exerciseTimestamp: moment(
-              tokenData?.token.option.exerciseTimestamp,
-              "X"
-            ).format(),
-            expiryTimestamp: moment(
-              tokenData?.token.option.expiryTimestamp,
-              "X"
-            ).format(),
+            exerciseTimestamp: exerciseDate.format(),
+            expiryTimestamp: expiryDate.format(),
           };
         });
 
