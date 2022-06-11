@@ -256,3 +256,7 @@ __pycache__/
 ## Google Auth
 ####################
 token.pickle
+
+
+node_modules
+.next
