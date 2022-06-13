@@ -65,6 +65,11 @@ export default styled.div`
     padding: 15px 20px;
   }
 
+  .button-group {
+    display: flex;
+    gap: 20px;
+  }
+
   .approve {
     margin-bottom: 20px;
   }

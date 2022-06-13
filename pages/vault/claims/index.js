@@ -12,11 +12,14 @@ import { claims as claimsQuery } from "../../../graphql/queries/claims";
 import unfreezeApolloCacheValue from "../../../lib/unfreezeApolloCacheValue";
 
 import StyledClaims from "./index.css.js";
+import ClaimModal from "../../../components/claimModal";
 
 class Claims extends React.Component {
   state = {
     loading: true,
     claims: [],
+    modalOpen: false,
+    selectedClaim: null,
   };
 
   componentDidMount() {
@@ -45,69 +48,85 @@ class Claims extends React.Component {
     });
   };
 
+  handleOpenModal = (claim) => {
+    this.setState({ selectedClaim: claim, modalOpen: true });
+  };
+
   render() {
-    const { loading, claims } = this.state;
+    const { loading, claims, modalOpen, selectedClaim } = this.state;
 
     // TODO(Collateral claim/redeem)
     // TODO(These are only claimable after expiry)
     // If the token is unclaimed and not yet expired, the user should see a grey claim button
     // TODO(View option detail)
     return (
-      <Vault>
-        <StyledClaims>
-          <header>
-            <h4>Claims</h4>
-          </header>
-          {loading && <Loader />}
-          {!loading && claims?.length === 0 && (
-            <BlankState
-              title="No claims found."
-              subtitle="Once you hold claims NFTs, they will show here."
-            />
-          )}
-          {!loading && claims?.length > 0 && (
-            <div className="claims">
-              <div className="responsive-table">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th className="text-center">Option Details</th>
-                      <th className="text-center">Contracts Written</th>
-                      <th className="text-center">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {claims?.map((item, index) => {
-                      return (
-                        <tr key={`claim-${item}-${index}`}>
-                          <td className="text-center">
-                            <Link
-                              href={`/vault/options?option=${item?.token?.claim?.option}`}
-                            >
-                              View Option
-                            </Link>
-                          </td>
-                          <td className="text-center">
-                            {item?.token?.claim?.amountWritten || 0}
-                          </td>
-                          <td className="text-center">
-                            <Button
-                              disabled={item?.token?.claim?.claimed}
-                              theme="purple-blue"
-                            >
-                              View Claim
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+      <React.Fragment>
+        <Vault>
+          <StyledClaims>
+            <header>
+              <h4>Claims</h4>
+            </header>
+            {loading && <Loader />}
+            {!loading && claims?.length === 0 && (
+              <BlankState
+                title="No claims found."
+                subtitle="Once you hold claims NFTs, they will show here."
+              />
+            )}
+            {!loading && claims?.length > 0 && (
+              <div className="claims">
+                <div className="responsive-table">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th className="text-center">Option Details</th>
+                        <th className="text-center">Contracts Written</th>
+                        <th className="text-center">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {claims?.map((item, index) => {
+                        return (
+                          <tr key={`claim-${item}-${index}`}>
+                            <td className="text-center">
+                              <Link
+                                href={`/vault/options?option=${item?.token?.claim?.option}`}
+                              >
+                                View Option
+                              </Link>
+                            </td>
+                            <td className="text-center">
+                              {item?.token?.claim?.amountWritten || 0}
+                            </td>
+                            <td className="text-center">
+                              <Button
+                                disabled={item?.token?.claim?.claimed}
+                                onClick={() => this.handleOpenModal(item)}
+                                theme="purple-blue"
+                              >
+                                View Claim
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
-        </StyledClaims>
-      </Vault>
+            )}
+          </StyledClaims>
+        </Vault>
+        {!loading && claims.length > 0 && (
+          <ClaimModal
+            open={modalOpen}
+            claim={selectedClaim}
+            onClose={() => {
+              this.setState({ modalOpen: false });
+            }}
+          />
+        )}
+      </React.Fragment>
     );
   }
 }
