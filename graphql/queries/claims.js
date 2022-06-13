@@ -4,6 +4,7 @@ export const claims = gql`
   query ClaimsAndOptionsBalances($account: String) {
     account(id: $account) {
       ERC1155balances(where: { valueExact_gt: "0" }) {
+        id
         token {
           type
           option {
@@ -12,6 +13,7 @@ export const claims = gql`
           }
           id
           claim {
+            amountExercised
             amountWritten
             claimed
             option
@@ -22,3 +24,7 @@ export const claims = gql`
     }
   }
 `;
+
+// export const claimDetails = gql`
+//   // query ClaimDetails($account: String, $token: String) {}
+// `;

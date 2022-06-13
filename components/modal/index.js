@@ -65,6 +65,11 @@ export default styled.div`
     padding: 15px 20px;
   }
 
+  .button-group {
+    display: flex;
+    gap: 20px;
+  }
+
   .approve {
     margin-bottom: 20px;
   }
@@ -111,7 +116,7 @@ export default styled.div`
   }
 `;
 
-export const OptionModalBackdrop = styled.div`
+export const ModalBackdrop = styled.div`
   position: fixed;
   display: ${(props) => (props.open ? "flex" : "none")};
   justify-content: center;
@@ -123,7 +128,7 @@ export const OptionModalBackdrop = styled.div`
   z-index: 99;
   padding: 0px 20px;
 
-  .option-modal {
+  .modal {
     display: ${(props) => (props.open ? "block" : "none")} !important;
   }
 `;

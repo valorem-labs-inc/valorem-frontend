@@ -2,11 +2,11 @@ import React from "react";
 import moment from "moment";
 import Button from "../button";
 import Warning from "../warning";
-import StyledOptionModal, { OptionModalBackdrop } from "./index.css.js";
+import StyledModal, { ModalBackdrop } from "../modal";
 import store from "../../lib/store";
 import graphql from "../../graphql/client";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { optionDetails as optionDetailsQuery } from "../../graphql/queries/options";
 
 class OptionModal extends React.Component {
@@ -83,8 +83,8 @@ class OptionModal extends React.Component {
     // TODO(The exercise button should be an approval button if the user needs to approve the exercise asset)
     return (
       <>
-        <OptionModalBackdrop open={open}>
-          <StyledOptionModal className="option-modal">
+        <ModalBackdrop open={open}>
+          <StyledModal className="modal">
             {hide && <i className="fas fa-xmark" onClick={onClose} />}
             <div className="option-row">
               <div className="option-datapoint">
@@ -157,8 +157,8 @@ class OptionModal extends React.Component {
                 </Button>
               )}
             </footer>
-          </StyledOptionModal>
-        </OptionModalBackdrop>
+          </StyledModal>
+        </ModalBackdrop>
       </>
     );
   }
