@@ -27,15 +27,6 @@ class Options extends React.Component {
   };
 
   async componentDidMount() {
-    const queryParams = queryString.parse(location.search);
-
-    if (queryParams?.option) {
-      return this.setState({
-        optionsModalOpen: true,
-        option: queryParams.option,
-      });
-    }
-
     await this.handleFetchOptions();
   }
 
@@ -137,10 +128,26 @@ class Options extends React.Component {
           };
         });
 
-        this.setState({
-          loading: false,
-          options: sortedAndFormattedData,
-        });
+        this.setState(
+          {
+            loading: false,
+            options: sortedAndFormattedData,
+          },
+          () => {
+            const queryParams = queryString.parse(location.search);
+
+            if (queryParams.option) {
+              const selectedOption = this.state.options.find(
+                (option) => option.optionId === queryParams.option
+              );
+
+              this.setState({
+                optionsModalOpen: true,
+                option: selectedOption,
+              });
+            }
+          }
+        );
       }
     });
   };
