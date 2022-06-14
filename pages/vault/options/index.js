@@ -137,9 +137,27 @@ class Options extends React.Component {
           };
         });
 
+        const filteredData = sortedAndFormattedData.filter((option) => {
+          const now = moment();
+
+          if (this.state.list === "expired") {
+            if (now.isAfter(option.expiryTimestamp)) {
+              return true;
+            }
+
+            return false;
+          }
+
+          if (now.isAfter(option.expiryTimestamp)) {
+            return false;
+          }
+
+          return true;
+        });
+
         this.setState({
           loading: false,
-          options: sortedAndFormattedData,
+          options: filteredData,
         });
       }
     });
@@ -147,7 +165,6 @@ class Options extends React.Component {
 
   handleSetList = (list = "active") => {
     this.setState({ list }, async () => {
-      this.state.list = list;
       await this.handleFetchOptions();
     });
   };
