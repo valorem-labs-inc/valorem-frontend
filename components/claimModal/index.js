@@ -57,6 +57,19 @@ class ClaimModal extends React.Component {
     // console.log(data);
   };
 
+  handleRedeemClaim = async () => {
+    const claimID = this.props.claim.token.claim.id;
+
+    const state = store.getState();
+
+    const connection = state?.wallet?.connection;
+    const { contract, signer } = connection;
+
+    await contract.connect(signer).redeem(claimID);
+
+    this.props.onClose();
+  };
+
   render() {
     return (
       <>
@@ -91,7 +104,9 @@ class ClaimModal extends React.Component {
               <Link href={`#TODO-ADD-OPTION`}>
                 <Button theme="cool-gray">View Option</Button>
               </Link>
-              <Button theme="purple-blue">Claim</Button>
+              <Button theme="purple-blue" onClick={this.handleRedeemClaim}>
+                Redeem
+              </Button>
             </div>
           </StyledModal>
         </ModalBackdrop>
