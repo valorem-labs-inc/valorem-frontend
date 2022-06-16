@@ -117,12 +117,12 @@ class Claims extends React.Component {
             )}
           </StyledClaims>
         </Vault>
-        {!loading && claims.length > 0 && (
+        {selectedClaim && (
           <ClaimModal
             open={modalOpen}
             claim={selectedClaim}
             onClose={() => {
-              this.setState({ modalOpen: false });
+              this.setState({ modalOpen: false, selectedClaim: null });
             }}
           />
         )}

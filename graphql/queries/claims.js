@@ -13,6 +13,7 @@ export const claims = gql`
           }
           id
           claim {
+            id
             amountExercised
             amountWritten
             claimed
