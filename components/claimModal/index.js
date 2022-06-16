@@ -9,6 +9,11 @@ import store from "../../lib/store";
 import unfreezeApolloCacheValue from "../../lib/unfreezeApolloCacheValue";
 
 class ClaimModal extends React.Component {
+  state = {
+    loading: false,
+    hasClaimToken: false,
+  };
+
   componentDidMount() {
     this.handleFetchClaimDetails();
   }
@@ -36,6 +41,23 @@ class ClaimModal extends React.Component {
   };
 
   handleFetchClaimDetails = async () => {
+    this.setState({ loading: true }, async () => {
+      const claimID = this.props.claim.token.claim.id;
+
+      const state = store.getState();
+
+      const connection = state?.wallet?.connection;
+      const { contract, accounts } = connection;
+      const userAccount = accounts[0].toLowerCase();
+
+      const balance = await contract.balanceOf(userAccount, claimID);
+
+      this.setState({
+        loading: false,
+        hasClaimToken: balance.toNumber() === 1 ? true : false,
+      });
+    });
+
     // const claim = this.props.claim;
     // console.log(claim);
     // const optionData = await this.getOptionDetails();
@@ -71,6 +93,8 @@ class ClaimModal extends React.Component {
   };
 
   render() {
+    const { loading, hasClaimToken } = this.state;
+    const { claim } = this.props;
     return (
       <>
         <ModalBackdrop open={this.props.open}>
@@ -101,10 +125,14 @@ class ClaimModal extends React.Component {
               </div>
             </div>
             <div className="button-group">
-              <Link href={`#TODO-ADD-OPTION`}>
+              <Link href={`/vault/options?option=${claim.token.claim.option}`}>
                 <Button theme="cool-gray">View Option</Button>
               </Link>
-              <Button theme="purple-blue" onClick={this.handleRedeemClaim}>
+              <Button
+                disabled={loading || !hasClaimToken}
+                theme="purple-blue"
+                onClick={this.handleRedeemClaim}
+              >
                 Redeem
               </Button>
             </div>
