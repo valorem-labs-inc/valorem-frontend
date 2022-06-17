@@ -97,12 +97,14 @@ class App extends React.Component {
   };
 
   isCorrectNetwork = (network = "") => {
-    const expectedChainId = {
-      development: 4,
-      production: 1,
-    }[process.env.NODE_ENV];
+    // TODO: Support other networks
 
-    return expectedChainId === network?.chainId;
+    // const expectedChainId = {
+    //   development: 4,
+    //   production: 1,
+    // }[process.env.NODE_ENV];
+
+    return network?.chainId === 4;
   };
 
   handleCorrectNetwork = (wallet) => {
@@ -114,14 +116,16 @@ class App extends React.Component {
   };
 
   handleIncorrectNetwork = () => {
-    const networkName = {
-      development: "Rinkeby Test Network",
-      production: "Ethereum Mainnet",
-    }[process.env.NODE_ENV];
+    // TODO: Support other networks
+
+    // const networkName = {
+    //   development: "Rinkeby Test Network",
+    //   production: "Ethereum Mainnet",
+    // }[process.env.NODE_ENV];
 
     store.dispatch({
       type: "DISCONNECT_WALLET",
-      walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
+      walletError: `Unsupported network. Double-check your network is Rinkeby in Metamask and try again.`,
     });
 
     Router.push("/");

@@ -9,6 +9,10 @@ module.exports = {
           url: "https://rinkeby.etherscan.io/address/0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
           address: "0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
         },
+        production: {
+          url: "https://rinkeby.etherscan.io/address/0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
+          address: "0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
+        },
       },
     },
     subgraph: {
