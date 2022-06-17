@@ -102,7 +102,7 @@ class App extends React.Component {
       production: 1,
     }[process.env.NODE_ENV];
 
-    return expectedChainId === network?.chainId;
+    return network?.chainId === 4 || network?.chainId === 1;
   };
 
   handleCorrectNetwork = (wallet) => {
