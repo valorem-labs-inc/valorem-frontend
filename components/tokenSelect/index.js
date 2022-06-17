@@ -8,7 +8,8 @@ class TokenSelect extends React.Component {
 
   render() {
     const { value, onChange } = this.props;
-    const tokensForEnvironment = tokens && tokens[process.env.NODE_ENV];
+      // TODO(This should branch based on network selected in metamask)
+    const tokensForEnvironment = tokens && tokens["development"];
 
     return (
       <React.Fragment>
