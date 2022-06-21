@@ -1,6 +1,6 @@
 import React from "react";
 
-import StyledLayout from "./layout.css.ts";
+import StyledLayout from "./layout.css";
 
 type LayoutState = {
 };
