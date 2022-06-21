@@ -14,7 +14,7 @@ module.exports = {
         name: "Rinkeby Test Network",
       },
       subgraph: {
-        uri: "https://api.studio.thegraph.com/query/13157/valorem/0.0.3",
+        uri: "https://api.studio.thegraph.com/query/29509/valorem-subgraph/v0.0.1",
       },
       infura: {
         projectId: "11b7fd47c34f4b8097cea3ffc2e215f1",
@@ -31,7 +31,7 @@ module.exports = {
         name: "Ethereum Mainnet",
       },
       subgraph: {
-        uri: "https://api.studio.thegraph.com/query/13157/valorem/0.0.3",
+        uri: "https://api.studio.thegraph.com/query/29509/valorem-subgraph/v0.0.1",
       },
       infura: {
         projectId: "11b7fd47c34f4b8097cea3ffc2e215f1",

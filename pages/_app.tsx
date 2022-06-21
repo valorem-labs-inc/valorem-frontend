@@ -117,7 +117,7 @@ class App extends React.Component<AppProps, AppState> {
     const networkName = getConfigValue("network.name");
     store.dispatch({
       type: "DISCONNECT_WALLET",
-      walletError: `Unsupported network. Double-check your network is ${networkName} in Metamask and try again.`,
+      walletError: `Unsupported network. Double-check your network is Rinkeby in Metamask and try again.`,
     });
 
     Router.push("/");
