@@ -7,8 +7,7 @@ type WarningProps = {
   children: React.ReactNode;
 };
 
-type WarningState = {
-};
+type WarningState = {};
 
 class Warning extends React.Component<WarningProps, WarningState> {
   state: WarningState = {};

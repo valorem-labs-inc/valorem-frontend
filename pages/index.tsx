@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 import Router from "next/router";
 import React from "react";
 import { connect } from "react-redux";
@@ -16,7 +16,6 @@ type IndexState = {
 };
 
 class Index extends React.Component<IndexProps, IndexState> {
-
   private index = React.createRef<HTMLDivElement>();
 
   constructor(props) {

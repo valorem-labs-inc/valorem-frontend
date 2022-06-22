@@ -7,20 +7,19 @@ import StyledBreadcrumbs from "./index.css";
 type Breadcrumb = {
   label: string;
   href: string;
-}
-
-type BreadcrumbsProps = {
 };
+
+type BreadcrumbsProps = {};
 
 type BreadcrumbsState = {
   breadcrumbs: Breadcrumb[];
   path: string;
-}
+};
 
 class Breadcrumbs extends React.Component<BreadcrumbsProps, BreadcrumbsState> {
   state: BreadcrumbsState = {
     breadcrumbs: [],
-    path: '',
+    path: "",
   };
 
   componentDidMount() {

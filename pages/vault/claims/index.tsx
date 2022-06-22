@@ -19,7 +19,7 @@ async function fetchClaims(): Promise<Claim[]> {
   let claims: string[] = [];
 
   if (!wallet) {
-    console.warn('No wallet, cannot fetch claims');
+    console.warn("No wallet, cannot fetch claims");
   } else {
     const account = wallet.accounts[0];
     if (account) {
@@ -29,8 +29,7 @@ async function fetchClaims(): Promise<Claim[]> {
   return [];
 }
 
-type ClaimsProps = {
-};
+type ClaimsProps = {};
 
 type ClaimsState = {
   loading: boolean;
@@ -147,4 +146,3 @@ class Claims extends React.Component<ClaimsProps, ClaimsState> {
 export default connect((state) => {
   return state;
 })(Claims);
-

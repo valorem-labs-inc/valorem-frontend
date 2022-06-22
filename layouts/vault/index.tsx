@@ -19,7 +19,6 @@ type VaultProps = {
 };
 
 class Vault extends React.Component<VaultProps, VaultState> {
-
   private vault = React.createRef<HTMLDivElement>();
 
   constructor(props) {
@@ -38,7 +37,9 @@ class Vault extends React.Component<VaultProps, VaultState> {
 
     this.setState({
       path: Router.asPath,
-      account: account ? `${account?.substring(0, 8)}...${account?.slice(-8)}` : "~",
+      account: account
+        ? `${account?.substring(0, 8)}...${account?.slice(-8)}`
+        : "~",
     });
   }
 
