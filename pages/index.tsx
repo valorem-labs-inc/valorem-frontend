@@ -1,4 +1,4 @@
-import Image from 'next/image';
+/* eslint-disable @next/next/no-img-element */
 import Router from "next/router";
 import React from "react";
 import { connect } from "react-redux";
@@ -52,7 +52,7 @@ class Index extends React.Component<IndexProps, IndexState> {
 
     return (
       <StyledIndex ref={this.index}>
-        <Image className="logo" src="/logo.png" alt="Valorem" />
+        <img className="logo" src="/logo.png" alt="Valorem" />
         <Button
           disabled={connectingWallet}
           onClick={this.handleConnectWallet}
