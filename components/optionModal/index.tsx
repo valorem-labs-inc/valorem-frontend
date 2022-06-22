@@ -12,10 +12,10 @@ import StyledModal, { ModalBackdrop } from "../modal";
 import Warning from "../warning";
 
 type OptionModalProps = {
-  option: Option,
-  balance: BigNumber,
-  canExercise: boolean,
-  needsApproval: boolean,
+  option: Option;
+  balance: BigNumber;
+  canExercise: boolean;
+  needsApproval: boolean;
   open: boolean;
   hide: boolean;
   onClose: () => void;
@@ -23,7 +23,16 @@ type OptionModalProps = {
 };
 
 function OptionModal(props: OptionModalProps): JSX.Element {
-  const { canExercise, option, balance, open, hide, needsApproval, onClose, onApprove, } = props;
+  const {
+    canExercise,
+    option,
+    balance,
+    open,
+    hide,
+    needsApproval,
+    onClose,
+    onApprove,
+  } = props;
   const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
 
   const handleExerciseOption = useCallback(async () => {
@@ -60,7 +69,14 @@ function OptionModal(props: OptionModalProps): JSX.Element {
     if (!option) {
       return <></>;
     }
-    const { exerciseAmount, exerciseAsset, exerciseTimestamp, expiryTimestamp, underlyingAmount, underlyingAsset } = option;
+    const {
+      exerciseAmount,
+      exerciseAsset,
+      exerciseTimestamp,
+      expiryTimestamp,
+      underlyingAmount,
+      underlyingAsset,
+    } = option;
     return (
       <React.Fragment>
         <div className="option-row">
@@ -83,15 +99,15 @@ function OptionModal(props: OptionModalProps): JSX.Element {
           <div className="option-datapoint">
             <h5>Underlying Asset Amount</h5>
             <h4>
-              {smartFormatCurrency(underlyingAmount, underlyingAsset)} {underlyingSymbol}{" "}
-              <span>(x {balance.toNumber()})</span>
+              {smartFormatCurrency(underlyingAmount, underlyingAsset)}{" "}
+              {underlyingSymbol} <span>(x {balance.toNumber()})</span>
             </h4>
           </div>
           <div className="option-datapoint">
             <h5>Exercise Asset Amount</h5>
             <h4>
-              {smartFormatCurrency(exerciseAmount, exerciseAsset)} {exerciseSymbol}{" "}
-              <span>(x {balance.toNumber()})</span>
+              {smartFormatCurrency(exerciseAmount, exerciseAsset)}{" "}
+              {exerciseSymbol} <span>(x {balance.toNumber()})</span>
             </h4>
           </div>
         </div>
@@ -107,18 +123,14 @@ function OptionModal(props: OptionModalProps): JSX.Element {
           {needsApproval && (
             <Warning center>
               <p>
-                Approval to withdraw from your account is required in order
-                to use this option. Click &ldquo;Approve{" "}
-                {underlyingSymbol}&rdquo; below to complete the transaction.
+                Approval to withdraw from your account is required in order to
+                use this option. Click &ldquo;Approve {underlyingSymbol}&rdquo;
+                below to complete the transaction.
               </p>
             </Warning>
           )}
           {needsApproval && (
-            <Button
-              className="approve"
-              theme="purple-blue"
-              onClick={onApprove}
-            >
+            <Button className="approve" theme="purple-blue" onClick={onApprove}>
               Approve {underlyingSymbol}
             </Button>
           )}
@@ -136,16 +148,26 @@ function OptionModal(props: OptionModalProps): JSX.Element {
         </footer>
       </React.Fragment>
     );
-   }, [option, balance, canExercise, handleExerciseOption, needsApproval, onApprove, onClose, underlyingSymbol, exerciseSymbol]);
+  }, [
+    option,
+    balance,
+    canExercise,
+    handleExerciseOption,
+    needsApproval,
+    onApprove,
+    onClose,
+    underlyingSymbol,
+    exerciseSymbol,
+  ]);
 
-    return (
-      <ModalBackdrop open={open}>
-        <StyledModal className="modal">
-          { hide && <i className="fas fa-xmark" onClick={onClose} /> }
-          { body }
-        </StyledModal>
-      </ModalBackdrop>
-    );
+  return (
+    <ModalBackdrop open={open}>
+      <StyledModal className="modal">
+        {hide && <i className="fas fa-xmark" onClick={onClose} />}
+        {body}
+      </StyledModal>
+    </ModalBackdrop>
+  );
 }
 
 export default OptionModal;

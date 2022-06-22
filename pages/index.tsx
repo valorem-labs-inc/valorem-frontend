@@ -16,7 +16,6 @@ type IndexState = {
 };
 
 class Index extends React.Component<IndexProps, IndexState> {
-
   private index = React.createRef<HTMLDivElement>();
 
   constructor(props) {

@@ -2,8 +2,7 @@ import React from "react";
 
 import StyledLayout from "./layout.css";
 
-type LayoutState = {
-};
+type LayoutState = {};
 
 type LayoutProps = {
   children: React.ReactNode;

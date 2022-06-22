@@ -9,7 +9,7 @@ import StyledSelect from "./index.css";
 type Option = {
   label: string;
   value: string;
-}
+};
 
 type SelectProps = {
   options: Option[];
@@ -25,7 +25,7 @@ type SelectState = {
   searchResults: Fuse.FuseResult<Option>[];
   selectedOption: Option | null;
   showDropdown: boolean;
-}
+};
 
 class Select extends React.Component<SelectProps, SelectState> {
   searchInput: React.RefObject<HTMLInputElement>;

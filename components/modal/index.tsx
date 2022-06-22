@@ -133,6 +133,7 @@ export const ModalBackdrop = styled.div`
   padding: 0px 20px;
 
   .modal {
-    display: ${(props: ModalBackdropProps) => (props.open ? "block" : "none")} !important;
+    display: ${(props: ModalBackdropProps) =>
+      props.open ? "block" : "none"} !important;
   }
 `;

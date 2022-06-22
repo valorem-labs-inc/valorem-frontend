@@ -28,7 +28,7 @@ type AppProps = {
 
 type AppState = {
   ready: boolean;
-}
+};
 
 class App extends React.Component<AppProps, AppState> {
   web3Modal: Web3Modal;

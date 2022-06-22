@@ -12,7 +12,10 @@ import OptionModal from "../../../../components/optionModal";
 import TokenSelect from "../../../../components/tokenSelect";
 import Warning from "../../../../components/warning";
 import Vault from "../../../../layouts/vault";
-import { smartFormatCurrency, smartParseCurrency } from "../../../../lib/currencyFormat";
+import {
+  smartFormatCurrency,
+  smartParseCurrency,
+} from "../../../../lib/currencyFormat";
 import store, { SiteStore } from "../../../../lib/store";
 import { Option, OptionDetails } from "../../../../lib/types";
 import {
@@ -26,14 +29,15 @@ const web3 = new Web3();
 const MAX_APPROVAL =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
-type NewOptionState = Omit<OptionDetails, "option"> & Option & {
-  balanceTooLow: boolean,
-  needsApproval: boolean,
-  needsNewOptionType: boolean,
-  underlyingAssetName: string;
-  writeWarning: string | null,
-  writingOption: boolean,
-};
+type NewOptionState = Omit<OptionDetails, "option"> &
+  Option & {
+    balanceTooLow: boolean;
+    needsApproval: boolean;
+    needsNewOptionType: boolean;
+    underlyingAssetName: string;
+    writeWarning: string | null;
+    writingOption: boolean;
+  };
 
 type NewOptionProps = {
   children: React.ReactNode;
@@ -62,11 +66,15 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
     underlyingAmount: ZERO,
   };
 
-  handleWrite = (contract: Contract, optionId = "", numberOfContracts: BigNumber = ZERO) => {
+  handleWrite = (
+    contract: Contract,
+    optionId = "",
+    numberOfContracts: BigNumber = ZERO
+  ) => {
     // TODO(This should push to the option detail once it exists)
     contract.write(optionId, numberOfContracts).then((response) => {
       contract.on("OptionsWritten", (optionId, writer, claimId, amount) => {
-        this.setState({'id': optionId});
+        this.setState({ id: optionId });
         Router.push(`/vault/options?option=${optionId}`);
       });
     });
@@ -79,13 +87,10 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
       this.state.balance
     );
     const hasAllowance = await checkIfHasAllowance(
-      option.underlyingAsset, 
+      option.underlyingAsset,
       option.underlyingAmount
     );
-    let optionId = await getOptionTypeId(
-      contract,
-      getOptionTypeHash(option)
-    );
+    let optionId = await getOptionTypeId(contract, getOptionTypeHash(option));
 
     if (!hasRequiredBalance) {
       this.setState({
@@ -105,32 +110,22 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
 
     if (!this.state.balanceTooLow && !this.state.needsApproval) {
       const total = BigNumber.from(this.state.balance);
-      
+
       if (parseInt(optionId) === 0) {
-        contract
-          .newChain(option)
-          .then(async (response) => {
-            contract.on("NewChain", async (newOptionId) => {
-              optionId = newOptionId;
-              this.handleWrite(
-                contract,
-                optionId,
-                this.state.balance
-              );
-            });
+        contract.newChain(option).then(async (response) => {
+          contract.on("NewChain", async (newOptionId) => {
+            optionId = newOptionId;
+            this.handleWrite(contract, optionId, this.state.balance);
           });
+        });
       } else {
-        this.handleWrite(
-          contract,
-          optionId,
-          this.state.balance
-        );
+        this.handleWrite(contract, optionId, this.state.balance);
       }
     }
   };
 
   makeOptionObject = (): Option => {
-    const { state }= this;
+    const { state } = this;
     return {
       id: state.id,
       underlyingAsset: state.underlyingAsset,
@@ -144,41 +139,38 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
   };
 
   doWriteOption = async (): Promise<void> => {
-    this.setState(
-      { writingOption: true },
-      async () => {
-        console.log('writing option');
-        const { wallet }: SiteStore = store.getState();
-        if (!wallet) {
-          console.warn("No wallet found");
-          this.setState({ writingOption: false });
-          return;
-        }
-        const { contract, signer } = wallet;
-        if (!contract) {
-          console.warn("No contract found");
-          this.setState({ writingOption: false });
-          return;
-        }
-        const contractWithSigner: Contract = contract.connect(signer);
-        const option: Option = this.makeOptionObject();
-
-        this.setState({ writingOption: true }, async () => {
-          await this.handleWriteContract(contractWithSigner, option);
-        });
+    this.setState({ writingOption: true }, async () => {
+      console.log("writing option");
+      const { wallet }: SiteStore = store.getState();
+      if (!wallet) {
+        console.warn("No wallet found");
+        this.setState({ writingOption: false });
+        return;
       }
-    );
-  }
+      const { contract, signer } = wallet;
+      if (!contract) {
+        console.warn("No contract found");
+        this.setState({ writingOption: false });
+        return;
+      }
+      const contractWithSigner: Contract = contract.connect(signer);
+      const option: Option = this.makeOptionObject();
+
+      this.setState({ writingOption: true }, async () => {
+        await this.handleWriteContract(contractWithSigner, option);
+      });
+    });
+  };
 
   handleWriteOption = async (event) => {
     event.preventDefault();
-    this.doWriteOption();
+    await this.doWriteOption();
   };
 
   handleApproveAndWrite = async (): Promise<void> => {
     const { underlyingAsset, underlyingAmount } = this.state;
     if (!underlyingAsset || !underlyingAmount.gt(0)) {
-      console.warn('No underlying asset or amount specified');
+      console.warn("No underlying asset or amount specified");
     } else {
       if (this.state.needsApproval) {
         await handleApproveToken(underlyingAsset);
@@ -186,7 +178,7 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
           this.doWriteOption();
         });
       } else {
-        this.doWriteOption();
+        await this.doWriteOption();
       }
     }
   };
@@ -208,7 +200,6 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
     } = this.state;
 
     console.log("statge", this.state);
-
 
     // TODO(Check here for assets being the same, they can't be)
     // TODO(Check here that the dates input are valid)
@@ -244,12 +235,16 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
                     />
                   </div>
                   <div className="form-input-group">
-                    <label htmlFor="exerciseTimestamp">Exercise From Date</label>
+                    <label htmlFor="exerciseTimestamp">
+                      Exercise From Date
+                    </label>
                     <DateTime
                       timeFormat={false}
                       value={moment.unix(exerciseTimestamp)}
                       onChange={(date) => {
-                        this.setState({ exerciseTimestamp: moment(date).unix() });
+                        this.setState({
+                          exerciseTimestamp: moment(date).unix(),
+                        });
                       }}
                     />
                   </div>
@@ -288,7 +283,12 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
                     paddingLeft="108px"
                     value={smartFormatCurrency(exerciseAmount, exerciseAsset)}
                     onChange={(event) => {
-                      this.setState({ exerciseAmount: smartParseCurrency(event?.target?.value || '0', exerciseAsset) });
+                      this.setState({
+                        exerciseAmount: smartParseCurrency(
+                          event?.target?.value || "0",
+                          exerciseAsset
+                        ),
+                      });
                     }}
                   />
                 </div>
@@ -317,9 +317,17 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
                     id="underlyingEther"
                     label="Ether"
                     paddingLeft="108px"
-                    value={smartFormatCurrency(underlyingAmount, underlyingAsset)}
+                    value={smartFormatCurrency(
+                      underlyingAmount,
+                      underlyingAsset
+                    )}
                     onChange={(event) => {
-                      this.setState({ underlyingAmount: smartParseCurrency(event?.target?.value || '0', underlyingAsset) });
+                      this.setState({
+                        underlyingAmount: smartParseCurrency(
+                          event?.target?.value || "0",
+                          underlyingAsset
+                        ),
+                      });
                     }}
                   />
                 </div>
@@ -331,7 +339,11 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
                 </p>
               </Warning>
               {writeWarning && <p className="write-warning">{writeWarning}</p>}
-              <Button disabled={writingOption} type="submit" theme="purple-blue">
+              <Button
+                disabled={writingOption}
+                type="submit"
+                theme="purple-blue"
+              >
                 {writingOption ? "Writing option..." : "Write New Option"}
               </Button>
             </fieldset>
@@ -345,30 +357,41 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
           needsApproval={needsApproval}
           option={this.makeOptionObject()}
           onApprove={this.handleApproveAndWrite}
-          onClose={() => { console.log('close option modal'); }}
+          onClose={() => {
+            console.log("close option modal");
+          }}
         />
       </Vault>
     );
   }
 }
 
-async function getOptionTypeId(contract: Contract, chainHash = ""): Promise<string> {
+async function getOptionTypeId(
+  contract: Contract,
+  chainHash = ""
+): Promise<string> {
   try {
     return contract.hashToOptionToken(chainHash);
   } catch (exception) {
     console.warn(exception);
   }
   return "";
-};
+}
 
 function getOptionTypeHash(option: Option) {
   const encoded = web3.eth.abi.encodeParameters(
     ["address", "uint40", "uint40", "address", "uint96", "uint160", "uint96"],
-    Object.values(option)
+    [
+      option.underlyingAsset,
+      option.exerciseTimestamp,
+      option.expiryTimestamp,
+      option.exerciseAsset,
+      option.underlyingAmount,
+      BigNumber.from(0),
+      option.exerciseAmount,
+    ]
   );
   return ethers.utils.keccak256(encoded);
-};
+}
 
 export default NewOption;
-
-
