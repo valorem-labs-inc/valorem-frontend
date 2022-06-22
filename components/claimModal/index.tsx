@@ -15,12 +15,12 @@ type ClaimProps = {
 };
 
 function ClaimModal(props: ClaimProps): JSX.Element {
-  const [ loading, setLoading ] = useState(false);
-  const [ hasClaim, setHasClaim ] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [hasClaim, setHasClaim] = useState<any>(null);
 
   const { claim, onClose, open } = props;
   const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
-  
+
   const fetchClaimBalance = useCallback(async () => {
     if (wallet) {
       setLoading(true);
@@ -31,13 +31,13 @@ function ClaimModal(props: ClaimProps): JSX.Element {
       setHasClaim(balance.toNumber() === 1 ? true : false);
       setLoading(false);
     }
-  }, [ wallet, claim.id ]);
+  }, [wallet, claim.id]);
 
   // fetch claim on initial load
   useEffect(() => {
     fetchClaimBalance();
-  }, [ fetchClaimBalance ]);
-  
+  }, [fetchClaimBalance]);
+
   const handleRedeemClaim = useCallback(async () => {
     if (wallet) {
       const { contract, signer } = wallet;
@@ -77,7 +77,7 @@ function ClaimModal(props: ClaimProps): JSX.Element {
           </div>
         </div>
       </>
-    )
+    );
   }, [loading]);
 
   return (
@@ -85,7 +85,7 @@ function ClaimModal(props: ClaimProps): JSX.Element {
       <ModalBackdrop open={open}>
         <StyledModal className="modal">
           <i className="fas fa-xmark" onClick={onClose} />
-          { modalBody }
+          {modalBody}
           <div className="button-group">
             <Link href={`/vault/options?option=${claim.option.id}`}>
               <a>

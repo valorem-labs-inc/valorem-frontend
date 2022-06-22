@@ -21,13 +21,11 @@ class TokenSelect extends React.Component<TokenSelectProps, TokenSelectState> {
           placeholder="Select a token..."
           value={value}
           onChange={onChange}
-          options={tokens.map(
-            ({ address, name, symbol, logoURI }) => {
-              // NOTE: Removed logoURI as the data is inconsistent and a lot of links in the token
-              // list just return 404s.
-              return { value: address, label: `${symbol} - ${name}` };
-            }
-          )}
+          options={tokens.map(({ address, name, symbol, logoURI }) => {
+            // NOTE: Removed logoURI as the data is inconsistent and a lot of links in the token
+            // list just return 404s.
+            return { value: address, label: `${symbol} - ${name}` };
+          })}
         />
       </React.Fragment>
     );

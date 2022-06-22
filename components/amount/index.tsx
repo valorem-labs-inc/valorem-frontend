@@ -15,8 +15,7 @@ class Amount extends React.Component<AmountProps> {
   state = {};
 
   render() {
-    const { id, label, paddingLeft, value, onChange, ...props } =
-      this.props;
+    const { id, label, paddingLeft, value, onChange, ...props } = this.props;
     return (
       <StyledAmount paddingLeft={paddingLeft}>
         <div className="input-cap">{label}</div>

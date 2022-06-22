@@ -19,10 +19,8 @@ import { OptionDetails, Wallet } from "../../../lib/types";
 import StyledOptions from "./index.css";
 
 const formatDate = (detail: OptionDetails, field: string): string => {
-  const fieldName = `${field}Timestamp`
-  return moment.unix(detail.option[fieldName]).format(
-    "MMM Do, YYYY"
-  );
+  const fieldName = `${field}Timestamp`;
+  return moment.unix(detail.option[fieldName]).format("MMM Do, YYYY");
 };
 
 const formatAmount = (detail: OptionDetails, field: string): string => {
@@ -30,7 +28,9 @@ const formatAmount = (detail: OptionDetails, field: string): string => {
   const assetField = `${field}Asset`;
   const token = getToken(detail.option[assetField]).symbol;
   const amount: BigNumber = detail.option[amountField];
-  const showAmount = amount.gt(0) ? smartFormatCurrency(amount, detail[assetField]): "~";
+  const showAmount = amount.gt(0)
+    ? smartFormatCurrency(amount, detail[assetField])
+    : "~";
   return `${showAmount} ${token}`;
 };
 
@@ -42,14 +42,17 @@ const shouldInclude = (active, checkDate: moment.Moment): boolean => {
   return checkDate.isBefore(now);
 };
 
-
-function Options():JSX.Element {
-  const [ list, setList ] = useState("active");
-  const [ optionDetailsList, setOptionDetailsList ] = useState<OptionDetails[]>([]);
-  const [ loading, setLoading ] = useState(false);
-  const [ optionDetail, setOptionDetail ] = useState<OptionDetails | null>(null);
-  const [ modalOpen, setModalOpen ] = useState(false);
-  const { query: { option: optionId = "" } } = useRouter();
+function Options(): JSX.Element {
+  const [list, setList] = useState("active");
+  const [optionDetailsList, setOptionDetailsList] = useState<OptionDetails[]>(
+    []
+  );
+  const [loading, setLoading] = useState(false);
+  const [optionDetail, setOptionDetail] = useState<OptionDetails | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const {
+    query: { option: optionId = "" },
+  } = useRouter();
   const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
 
   const fetchOptions = useCallback(async () => {
@@ -72,24 +75,31 @@ function Options():JSX.Element {
     setLoading(false);
   }, [wallet]);
 
-  const visibleOptions = useMemo(() => {  
-    const active = list === 'active';
-    return optionDetailsList.filter(item => shouldInclude(active, moment.unix(item.option.expiryTimestamp)));
-  }, [ list, optionDetailsList ]);
+  const visibleOptions = useMemo(() => {
+    const active = list === "active";
+    return optionDetailsList.filter((item) =>
+      shouldInclude(active, moment.unix(item.option.expiryTimestamp))
+    );
+  }, [list, optionDetailsList]);
 
   useEffect(() => {
     if (!loading) {
       if (optionDetailsList.length > 0 && optionId) {
-        const option = optionDetailsList.find(o => o.option.id === optionId);
-        console.log(`got optionDetailsList (${optionDetailsList.length}) and option #${optionId}: ${option}`);
+        const option = optionDetailsList.find((o) => o.option.id === optionId);
+        console.log(
+          `got optionDetailsList (${optionDetailsList.length}) and option #${optionId}: ${option}`
+        );
         setOptionDetail(option || null);
         setModalOpen(!!option);
       } else {
-        console.log(`no optionDetailsList or option`, JSON.stringify({optionDetailsList, optionId}));
+        console.log(
+          `no optionDetailsList or option`,
+          JSON.stringify({ optionDetailsList, optionId })
+        );
         setModalOpen(false);
       }
     }
-  }, [ optionDetailsList, optionId, loading ]);
+  }, [optionDetailsList, optionId, loading]);
 
   const handleOpenOptionModal = useCallback((optionData: OptionDetails) => {
     setOptionDetail(optionData);
@@ -132,9 +142,7 @@ function Options():JSX.Element {
             return (
               <li
                 key={`item-${optionDetail?.option.id}`}
-                className={`option ${
-                  list === "expired" ? "expired" : ""
-                }`}
+                className={`option ${list === "expired" ? "expired" : ""}`}
                 onClick={() => handleOpenOptionModal(optionDetail)}
               >
                 <div className="option-row">
@@ -146,27 +154,25 @@ function Options():JSX.Element {
                 <div className="option-row">
                   <div className="option-datapoint">
                     <h5>Exercise Date</h5>
-                    <h4>{ formatDate(optionDetail, "exercise") }</h4>
+                    <h4>{formatDate(optionDetail, "exercise")}</h4>
                   </div>
                   <div className="option-datapoint">
                     <h5>Expiry Date</h5>
-                    <h4>{ formatDate(optionDetail, "expiry") }</h4>
+                    <h4>{formatDate(optionDetail, "expiry")}</h4>
                   </div>
                 </div>
                 <div className="option-row">
                   <div className="option-datapoint">
                     <h5>Underlying Asset Amount</h5>
                     <h4>
-                      { formatAmount(optionDetail, "underlying") }
-                      {" "}
+                      {formatAmount(optionDetail, "underlying")}{" "}
                       <span>(x {optionDetail?.balance.toNumber() || 0})</span>
                     </h4>
                   </div>
                   <div className="option-datapoint">
                     <h5>Exercise Asset Amount</h5>
                     <h4>
-                      { formatAmount(optionDetail, "exercise") }
-                      {" "}
+                      {formatAmount(optionDetail, "exercise")}{" "}
                       <span>(x {optionDetail?.balance.toNumber() || 0})</span>
                     </h4>
                   </div>
@@ -214,7 +220,7 @@ function Options():JSX.Element {
               </li>
             </ul>
           </div>
-          { pageBody }
+          {pageBody}
         </StyledOptions>
       </Vault>
       <OptionModal
@@ -225,7 +231,7 @@ function Options():JSX.Element {
         balance={optionDetail?.balance}
         needsApproval={optionDetail?.needsApproval}
         onApprove={() => {
-          console.log('approved - implement me');
+          console.log("approved - implement me");
         }}
         onClose={() => {
           setModalOpen(false);
