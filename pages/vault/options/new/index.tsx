@@ -172,7 +172,7 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
 
   handleWriteOption = async (event) => {
     event.preventDefault();
-    this.doWriteOption();
+    await this.doWriteOption();
   };
 
   handleApproveAndWrite = async (): Promise<void> => {
@@ -186,7 +186,7 @@ class NewOption extends React.Component<NewOptionProps, NewOptionState> {
           this.doWriteOption();
         });
       } else {
-        this.doWriteOption();
+        await this.doWriteOption();
       }
     }
   };
@@ -364,7 +364,7 @@ async function getOptionTypeId(contract: Contract, chainHash = ""): Promise<stri
 function getOptionTypeHash(option: Option) {
   const encoded = web3.eth.abi.encodeParameters(
     ["address", "uint40", "uint40", "address", "uint96", "uint160", "uint96"],
-    Object.values(option)
+    [option.underlyingAsset, option.exerciseTimestamp, option.expiryTimestamp, option.exerciseAsset, option.underlyingAmount, BigNumber.from(0), option.exerciseAmount]
   );
   return ethers.utils.keccak256(encoded);
 };
