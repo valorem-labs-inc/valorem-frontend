@@ -49,6 +49,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
     return "???";
   }, [ option ]);
 
+  // TODO(The approval button needs to work correctly)
   // TODO(The exercise button should be disabled if the present timestamp is incorrect)
   // TODO(The exercise button should be disabled if the balance is 0)
   // TODO(The exercise button should fail/be disabled if the user's balance of the exercise asset is too low)
@@ -107,7 +108,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
             <Warning center>
               <p>
                 Approval to withdraw from your account is required in order
-                to write this option. Click &ldquo;Approve{" "}
+                to use this option. Click &ldquo;Approve{" "}
                 {underlyingSymbol}&rdquo; below to complete the transaction.
               </p>
             </Warning>
@@ -118,7 +119,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
               theme="purple-blue"
               onClick={onApprove}
             >
-              Approve {underlyingSymbol} &amp; Write Options
+              Approve {underlyingSymbol}
             </Button>
           )}
           {!needsApproval && (
