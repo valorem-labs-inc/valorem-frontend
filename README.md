@@ -5,7 +5,6 @@
 2. GraphQL
 3. Wallets/Ethers
 
-
 ## Getting Started
 
 In order to run the app in development, the `npm run dev` command is best. This runs the Next.js development server for the app. From your terminal at the root of the project:
@@ -29,7 +28,7 @@ All environment settings are stored in the `next.config.js` file, utilizing that
 For subgraph access, the app uses the Apollo GraphQL library. The connection to the subgraph is established in `/graphql/client.js` with individual queries being defined by their "topic" in the `/graphql/queries` folder. The convention here (which also applies to mutations in `/graphql/mutations` if any are added) is to import the `gql` function from the `graphql-tag` package and from the file, provide a named export for your query that can be imported into the UI:
 
 ```javascript
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 export const claims = gql`
   query claims($where: Claim_filter) {
@@ -52,7 +51,7 @@ export const claims = gql`
 `;
 ```
 
-For simplicity, the GraphQL client and queries are imported directly into the UI for querying. For example, in `/pages/vault/claims/index.js`:
+For simplicity, the GraphQL client and queries are imported directly into the UI for querying. For example, in `/pages/vault/claims/index.ts`:
 
 ```javascript
 import Router from 'next/router';
@@ -64,7 +63,7 @@ import graphql from '../../../graphql/client';
 import { claims as claimsQuery } from '../../../graphql/queries/claims';
 import unfreezeApolloCacheValue from '../../../lib/unfreezeApolloCacheValue';
 
-import StyledClaims from './index.css.js';
+import StyledClaims from './index.css';
 
 class Claims extends React.Component {
   state = {
@@ -90,7 +89,7 @@ class Claims extends React.Component {
       });
 
       const sanitizedData = unfreezeApolloCacheValue(data?.claims || []);
-  
+
       this.setState({
         loading: false,
         claims: sanitizedData,
@@ -124,4 +123,4 @@ For wallet connections, the web3modal library is used. In order to perform the c
 
 Once this connection is obtained and stored in the Redux store, it's referenced while the user is connected to the app. If they refresh the page (or close the tab), the wallet connection is removed from the store and the user is redirected to the index and asked to reconnect.
 
-For performing RPC requests, the Ethers connection obtained in `/lib/getWalletConnection.js` is utilized. Depending on the task, either the existing Ethers wallet connection is used, or, a new one is established (e.g., when needing access to the ERC-20 contract). The best example of this usage is located in `/pages/vault/options/new/index.js`.
+For performing RPC requests, the Ethers connection obtained in `/lib/getWalletConnection.js` is utilized. Depending on the task, either the existing Ethers wallet connection is used, or, a new one is established (e.g., when needing access to the ERC-20 contract). The best example of this usage is located in `/pages/vault/options/new/index.ts`.

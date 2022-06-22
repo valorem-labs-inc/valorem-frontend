@@ -37,7 +37,6 @@ A wallet contains many addresses of many token types. For e.g., I can have 50 ET
 
 An address (a.k.a "account") can send and receive transactions based on its current balance. E.g., the address abc123 can send some or all of its balance to def456. An addresses' balance is the sum of all of its inputs (received), minus its outputs (sent).
 
-
 ---
 
 # Wallet Connection
@@ -47,13 +46,12 @@ When connecting to MetaMask, whichever wallet was currently "active" or "selecte
 // providers get data from smart contract
 // signer is used for signing data/setting data to smart contract
 
----------
+---
 
 Implementation
 
 - When connecting a wallet, if not on the correct network, throw an error and don't allow wallet to connect until fixed.
-- When creating provider 
-
+- When creating provider
 
 1. Check for required balance of underlyingAsset.
    X 1A. If balance met, continue.
@@ -66,4 +64,3 @@ Implementation
    1B. If it doesn't exist, pop up request for approval.
    1C. After approval, skip to write contract.
 4. Write the contract(s).
-   
