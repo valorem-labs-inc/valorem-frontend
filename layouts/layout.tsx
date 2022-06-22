@@ -18,7 +18,7 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
       <StyledLayout>
         <nav>
           <a className="logo" href="/">
-            <img src="/logo.png" alt="Valorem" />
+            <img className="logo" src="/logo.png" alt="Valorem"/>
           </a>
         </nav>
         {children}

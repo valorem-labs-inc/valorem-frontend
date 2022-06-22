@@ -1,6 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import Fuse from "fuse.js";
 import _ from "lodash";
-import Image from "next/image";
 import React from "react";
 
 import AngleDown from "../icons/AngleDown";
@@ -146,7 +146,7 @@ class Select extends React.Component<SelectProps, SelectState> {
                     }
                   >
                     {option?.logo && (
-                      <Image src={option.logo} alt={option.label} />
+                      <img src={option.logo} alt={option.label} />
                     )}{" "}
                     {option.label}
                   </li>

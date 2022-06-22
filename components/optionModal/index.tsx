@@ -45,18 +45,18 @@ function OptionModal(props: OptionModalProps): JSX.Element {
   const exerciseSymbol = useMemo(() => {
     if (option) {
       const token = getToken(option.exerciseAsset);
-      return token?.symbol ?? "???";
+      return token?.symbol ?? "";
     }
-    return "???";
-  }, [option]);
+    return "";
+  }, [ option ]);
 
   const underlyingSymbol = useMemo(() => {
     if (option) {
       const token = getToken(option.underlyingAsset);
-      return token?.symbol ?? "???";
+      return token?.symbol ?? "";
     }
-    return "???";
-  }, [option]);
+    return "";
+  }, [ option ]);
 
   // TODO(The approval button needs to work correctly)
   // TODO(The exercise button should be disabled if the present timestamp is incorrect)
