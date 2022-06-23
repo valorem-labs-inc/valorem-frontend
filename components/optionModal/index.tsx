@@ -2,14 +2,17 @@ import { BigNumber } from "ethers";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useAccount, useContract, useSigner } from "wagmi";
 
 import { smartFormatCurrency } from "../../lib/currencyFormat";
+import getConfigValue from "../../lib/getConfigValue";
 import getToken from "../../lib/getToken";
 import store, { SiteStore } from "../../lib/store";
 import { Option, Wallet } from "../../lib/types";
 import Button from "../button";
 import StyledModal, { ModalBackdrop } from "../modal";
 import Warning from "../warning";
+import optionsSettlementEngineABI from "../../lib/abis/optionsSettlementEngine";
 
 type OptionModalProps = {
   option: Option;
@@ -33,14 +36,22 @@ function OptionModal(props: OptionModalProps): JSX.Element {
     onClose,
     onApprove,
   } = props;
-  const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
+  const { data: account } = useAccount();
+  const { data: signer } = useSigner();
+
+  const optionsSettlementEngineAddress = getConfigValue("contract.address");
+
+  const contract = useContract({
+    addressOrName: optionsSettlementEngineAddress,
+    contractInterface: optionsSettlementEngineABI,
+    signerOrProvider: signer,
+  });
 
   const handleExerciseOption = useCallback(async () => {
-    if (wallet && option) {
-      const { contract, signer } = wallet;
+    if (account && option && contract && signer) {
       await contract.connect(signer).exercise(option.id, balance);
     }
-  }, [option, balance, wallet]);
+  }, [account, balance, contract, option, signer]);
 
   const exerciseSymbol = useMemo(() => {
     if (option) {
@@ -48,7 +59,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
       return token?.symbol ?? "";
     }
     return "";
-  }, [ option ]);
+  }, [option]);
 
   const underlyingSymbol = useMemo(() => {
     if (option) {
@@ -56,7 +67,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
       return token?.symbol ?? "";
     }
     return "";
-  }, [ option ]);
+  }, [option]);
 
   // TODO(The approval button needs to work correctly)
   // TODO(The exercise button should be disabled if the present timestamp is incorrect)

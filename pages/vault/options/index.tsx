@@ -4,7 +4,7 @@ import moment from "moment";
 import Router from "next/router";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAccount, useSigner } from "wagmi";
 
 import BlankState from "../../../components/blankState";
 import Button from "../../../components/button";
@@ -14,8 +14,7 @@ import Vault from "../../../layouts/vault";
 import { smartFormatCurrency } from "../../../lib/currencyFormat";
 import { getOptionsWithDetails } from "../../../lib/getOptions";
 import getToken from "../../../lib/getToken";
-import store, { SiteStore } from "../../../lib/store";
-import { OptionDetails, Wallet } from "../../../lib/types";
+import { OptionDetails } from "../../../lib/types";
 import StyledOptions from "./index.css";
 
 const formatDate = (detail: OptionDetails, field: string): string => {
@@ -53,16 +52,18 @@ function Options(): JSX.Element {
   const {
     query: { option: optionId = "" },
   } = useRouter();
-  const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
+
+  const { data: account } = useAccount();
+  const { data: signer } = useSigner();
 
   const fetchOptions = useCallback(async () => {
     setLoading(true);
-    if (!wallet) {
+
+    if (!account) {
       setLoading(false);
       return;
     }
-    const { signer } = wallet;
-    const userAccount = wallet.accounts[0].toLowerCase();
+    const userAccount = account.address.toLowerCase();
 
     if (!userAccount) {
       console.log("No user account, cannot fetch options");
@@ -71,9 +72,10 @@ function Options(): JSX.Element {
     }
 
     const userOptions = await getOptionsWithDetails(userAccount, signer);
+
     setOptionDetailsList(userOptions);
     setLoading(false);
-  }, [wallet]);
+  }, [account, signer]);
 
   const visibleOptions = useMemo(() => {
     const active = list === "active";

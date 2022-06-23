@@ -1,6 +1,7 @@
-import { BigNumber } from "ethers";
+import { BigNumber, Contract, Signer } from "ethers";
 
 import store, { SiteStore } from "./store";
+import erc20ABI from "./abis/erc20";
 
 export async function checkIfHasRequiredBalance(
   asset: string,
@@ -48,26 +49,19 @@ export async function checkIfHasAllowance(
 
 export async function handleApproveToken(
   asset: string,
+  spender: string,
+  signer: Signer,
   callback?: (response: any) => void
 ): Promise<void> {
-  const state: SiteStore = store.getState();
-  const { wallet } = state;
-
-  if (!wallet) {
-    console.warn("No wallet connected");
-    return;
-  }
-
-  const erc20Instance = wallet.erc20(asset);
+  const erc20Instance = new Contract(asset, erc20ABI, signer);
 
   if (!erc20Instance) {
     console.warn(`No erc20 instance for "${asset}" - no approval possible`);
     return;
   }
-  const erc20InstanceWithSigner = erc20Instance.connect(wallet.signer);
 
-  const approvalTransaction = await erc20InstanceWithSigner.approve(
-    wallet.optionsSettlementEngineAddress,
+  const approvalTransaction = await erc20Instance.approve(
+    spender,
     "115792089237316195423570985008687907853269984665640564039457584007913129639935"
   );
 

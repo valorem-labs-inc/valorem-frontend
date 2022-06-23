@@ -1,10 +1,11 @@
 import { BigNumber } from "ethers";
-import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import Link from "next/link";
+import { useAccount, useContract, useContractRead, useSigner } from "wagmi";
+import getConfigValue from "../../lib/getConfigValue";
 
-import { SiteStore } from "../../lib/store";
-import { Claim, Wallet } from "../../lib/types";
+import { Claim } from "../../lib/types";
+import optionsSettlementEngineABI from "../../lib/abis/optionsSettlementEngine";
 import Button from "../button";
 import StyledModal, { ModalBackdrop } from "../modal";
 
@@ -19,32 +20,39 @@ function ClaimModal(props: ClaimProps): JSX.Element {
   const [hasClaim, setHasClaim] = useState<any>(null);
 
   const { claim, onClose, open } = props;
-  const wallet: Wallet = useSelector((state: SiteStore) => state.wallet);
 
-  const fetchClaimBalance = useCallback(async () => {
-    if (wallet) {
-      setLoading(true);
+  const { data: account } = useAccount();
+  const { data: signer } = useSigner();
 
-      const { contract, accounts } = wallet;
-      const userAccount = accounts[0].toLowerCase();
-      const balance = await contract.balanceOf(userAccount, claim.id);
-      setHasClaim(balance.toNumber() === 1 ? true : false);
-      setLoading(false);
+  const optionsSettlementEngineAddress = getConfigValue("contract.address");
+
+  const contract = useContract({
+    addressOrName: optionsSettlementEngineAddress,
+    contractInterface: optionsSettlementEngineABI,
+    signerOrProvider: signer,
+  });
+
+  const { data: claimBalance } = useContractRead(
+    {
+      addressOrName: optionsSettlementEngineAddress,
+      contractInterface: optionsSettlementEngineABI,
+    },
+    "balanceOf",
+    {
+      args: [account?.address.toLowerCase(), claim.id],
     }
-  }, [wallet, claim.id]);
+  );
 
-  // fetch claim on initial load
   useEffect(() => {
-    fetchClaimBalance();
-  }, [fetchClaimBalance]);
+    setHasClaim(claimBalance.toNumber() === 1 ? true : false);
+  }, [claimBalance]);
 
   const handleRedeemClaim = useCallback(async () => {
-    if (wallet) {
-      const { contract, signer } = wallet;
+    if (account) {
       await contract.connect(signer).redeem(claim.id);
     }
     onClose();
-  }, [claim.id, onClose, wallet]);
+  }, [account, claim.id, contract, onClose, signer]);
 
   const modalBody = useMemo(() => {
     if (loading) {
