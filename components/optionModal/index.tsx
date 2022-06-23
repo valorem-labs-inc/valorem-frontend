@@ -1,13 +1,11 @@
 import { BigNumber } from "ethers";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
 import { useAccount, useContract, useSigner } from "wagmi";
 
 import { smartFormatCurrency } from "../../lib/currencyFormat";
 import getConfigValue from "../../lib/getConfigValue";
 import getToken from "../../lib/getToken";
-import store, { SiteStore } from "../../lib/store";
 import { Option, Wallet } from "../../lib/types";
 import Button from "../button";
 import StyledModal, { ModalBackdrop } from "../modal";

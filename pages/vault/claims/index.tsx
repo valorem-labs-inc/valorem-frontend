@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
 import { useAccount } from "wagmi";
 
 import BlankState from "../../../components/blankState";
