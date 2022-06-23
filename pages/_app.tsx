@@ -26,11 +26,13 @@ const client = createClient({
       chains: [chain.mainnet, chain.rinkeby],
     }),
     new WalletConnectConnector({
+      chains: [chain.mainnet, chain.rinkeby],
       options: {
         qrcode: true,
       },
     }),
     new CoinbaseWalletConnector({
+      chains: [chain.mainnet, chain.rinkeby],
       options: {
         appName: "Valorem Options",
         jsonRpcUrl: `https://mainnet.infura.io/v3/${getConfigValue(
