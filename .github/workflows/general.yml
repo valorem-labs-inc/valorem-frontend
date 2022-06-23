@@ -1,0 +1,55 @@
+name: "Valorem Frontend CI/CD"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Cache node modules and next folder
+      - name: 📬 Caching
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.x
+
+      - name: 🧰 Install dependencies
+        run: npm ci
+
+      - name: 📦 Build project
+        run: npm run build --if-present
+
+      - name: 🧹 Run lint & check formatting
+        run: npm run lint && npm run format
+
+      - name: 🐛 Run tests
+        run: npm run test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "valorem-frontend"
+          heroku_email: ${{secrets.HEROKU_API_EMAIL}}
