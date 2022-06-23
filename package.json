@@ -7,14 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write {,*/**/}*.{js,json,css,css.js}"
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@apollo/client": "^3.6.1",
+    "@apollo/client": "^3.6.8",
     "@coinbase/wallet-sdk": "^3.0.5",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
@@ -27,7 +28,7 @@
     "eth-provider": "^0.10.0",
     "ethers": "^5.6.2",
     "fuse.js": "^6.5.3",
-    "graphql": "^16.4.0",
+    "graphql": "^16.5.0",
     "graphql-tag": "^2.12.6",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",
@@ -38,13 +39,11 @@
     "react": "^17.0.2",
     "react-datetime": "^3.1.1",
     "react-dom": "^17.0.2",
-    "react-redux": "^7.2.8",
     "react-select": "^5.3.0",
-    "redux": "^4.1.2",
     "store": "^2.0.12",
     "styled-components": "^5.3.5",
-    "web3": "^1.7.1",
-    "web3modal": "^1.9.5"
+    "wagmi": "^0.4.12",
+    "web3": "^1.7.1"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",

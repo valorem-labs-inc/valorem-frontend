@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, Signer } from "ethers";
 import moment from "moment";
 
 import graphql from "../graphql/client";
@@ -32,16 +32,20 @@ async function getRawOptions(account: string): Promise<GraphBalancesResponse> {
       account: account.toLowerCase(),
     },
   };
+
   const results = await graphql.query(q);
+
   if (!results) {
     console.error("no results", q);
     return { account: { ERC1155balances: [] } };
   }
+
   const { data } = results;
   if (!data) {
     console.log("empty options");
     return { account: { ERC1155balances: [] } };
   }
+
   console.log(`returning ${data.account.ERC1155balances.length} options`);
   return data as GraphBalancesResponse;
 }
@@ -63,9 +67,10 @@ export default async function getOptions(account: string): Promise<Option[]> {
 
 export async function getOptionsWithDetails(
   account: string,
-  provider: ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcSigner
+  provider: Signer
 ): Promise<OptionDetails[]> {
   const graphResponse = await getRawOptions(account);
+
   let options: OptionDetails[] = [];
   const tokenBalances: Record<string, BigNumber> = {};
   const now = moment();
@@ -82,18 +87,20 @@ export async function getOptionsWithDetails(
   };
 
   if (graphResponse.account?.ERC1155balances) {
-    console.log(
-      "response",
-      JSON.stringify(graphResponse.account.ERC1155balances, null, 2)
-    );
+    // console.log(
+    // "response",
+    // JSON.stringify(graphResponse.account.ERC1155balances, null, 2)
+    // );
     const type1Balances = graphResponse.account.ERC1155balances.filter(
       ({ token }) => token.type === 1
     );
-    console.log("type1Balances", type1Balances);
+    // console.log("type1Balances", type1Balances);
     const balanceQueries = type1Balances.map(({ token }) =>
       getAssetBalance(token.option.underlyingAsset.id)
     );
+
     const balances = await Promise.all(balanceQueries);
+
     options = type1Balances.map(({ token, valueExact }, index) => {
       const tokenBalance = balances[index];
       const graphOption = unfreezeApolloCacheValue(token.option);
@@ -103,7 +110,6 @@ export async function getOptionsWithDetails(
       const canExercise =
         tokenBalance.gte(option.exerciseAmount) &&
         now.isBetween(firstDate, lastDate);
-
       return {
         balance: BigNumber.from(valueExact),
         option,
@@ -116,6 +122,7 @@ export async function getOptionsWithDetails(
       return a.option.expiryTimestamp - b.option.expiryTimestamp;
     });
   }
-  console.log(`returning ${options.length} options`);
+  // return null;
+  // console.log(`returning ${options.length} options`);
   return options;
 }
