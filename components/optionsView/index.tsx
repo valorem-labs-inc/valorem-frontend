@@ -63,6 +63,7 @@ function Options(): JSX.Element {
       setLoading(false);
       return;
     }
+
     const userAccount = account.address.toLowerCase();
 
     if (!userAccount) {
@@ -110,8 +111,10 @@ function Options(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    fetchOptions();
-  }, [fetchOptions]);
+    if (signer) {
+      fetchOptions();
+    }
+  }, [fetchOptions, signer]);
 
   const pageBody = useMemo(() => {
     if (loading) {
