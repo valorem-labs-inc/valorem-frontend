@@ -1,51 +1,6 @@
-import { BigNumber, Contract, Signer } from "ethers";
+import { Contract, Signer } from "ethers";
 
-import store, { SiteStore } from "./store";
 import erc20ABI from "./abis/erc20";
-
-export async function checkIfHasRequiredBalance(
-  asset: string,
-  amountInWei: BigNumber,
-  numberOfContracts: BigNumber
-): Promise<boolean> {
-  const { wallet }: SiteStore = store.getState();
-  if (!wallet) {
-    console.warn("No wallet connected");
-    return false;
-  }
-  const erc20Instance = wallet.erc20(asset);
-  const underlyingAssetBalance: BigNumber = await erc20Instance.balanceOf(
-    wallet.accounts[0]
-  );
-  const totalUnderlyingAmount = amountInWei.mul(numberOfContracts);
-
-  return underlyingAssetBalance.gte(totalUnderlyingAmount);
-}
-
-export async function checkIfHasAllowance(
-  asset: string,
-  requiredAmountInWei?: BigNumber
-): Promise<boolean> {
-  const { wallet }: SiteStore = store.getState();
-  if (!wallet) {
-    console.warn("No wallet connected");
-    return false;
-  }
-  const erc20Instance = wallet.erc20(asset);
-  if (!erc20Instance) {
-    console.warn(`No erc20 instance for "${asset}" - no allowance check`);
-    return false;
-  }
-  const allowanceResponse: BigNumber = await erc20Instance.allowance(
-    wallet.accounts[0],
-    wallet.optionsSettlementEngineAddress
-  );
-
-  return (
-    allowanceResponse &&
-    allowanceResponse.gt(requiredAmountInWei ?? BigNumber.from(0))
-  );
-}
 
 export async function handleApproveToken(
   asset: string,

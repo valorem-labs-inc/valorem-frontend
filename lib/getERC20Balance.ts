@@ -9,5 +9,5 @@ export default async function getERC20Balance(
 ) {
   const contract = new Contract(address, erc20ABI, provider);
 
-  return contract.balanceOf(address);
+  return contract.balanceOf(account);
 }
