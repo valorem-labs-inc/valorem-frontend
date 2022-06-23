@@ -1,37 +1,18 @@
-import { BigNumber } from "ethers";
-import _ from "lodash";
-import moment from "moment";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount, useSigner } from "wagmi";
+import _ from "lodash";
+import moment from "moment";
 
 import BlankState from "../blankState";
 import Button from "../button";
 import Loader from "../loader";
 import OptionModal from "../optionModal";
 import Vault from "../../layouts/vault";
-import { smartFormatCurrency } from "../../lib/currencyFormat";
-import { getOptionsWithDetails } from "../../lib/getOptions";
-import getToken from "../../lib/getToken";
 import { OptionDetails } from "../../lib/types";
 import StyledOptions from "./index.css";
-
-const formatDate = (detail: OptionDetails, field: string): string => {
-  const fieldName = `${field}Timestamp`;
-  return moment.unix(detail.option[fieldName]).format("MMM Do, YYYY");
-};
-
-const formatAmount = (detail: OptionDetails, field: string): string => {
-  const amountField = `${field}Amount`;
-  const assetField = `${field}Asset`;
-  const token = getToken(detail.option[assetField]).symbol;
-  const amount: BigNumber = detail.option[amountField];
-  const showAmount = amount.gt(0)
-    ? smartFormatCurrency(amount, detail[assetField])
-    : "~";
-  return `${showAmount} ${token}`;
-};
+import { useOptions } from "../../graphql/hooks/useOptions";
+import OptionsList from "../optionsList";
 
 const shouldInclude = (active, checkDate: moment.Moment): boolean => {
   const now = moment();
@@ -43,66 +24,37 @@ const shouldInclude = (active, checkDate: moment.Moment): boolean => {
 
 function Options(): JSX.Element {
   const [list, setList] = useState("active");
-  const [optionDetailsList, setOptionDetailsList] = useState<OptionDetails[]>(
-    []
-  );
-  const [loading, setLoading] = useState(false);
   const [optionDetail, setOptionDetail] = useState<OptionDetails | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
   const {
     query: { option: optionId = "" },
   } = useRouter();
 
-  const { data: account } = useAccount();
-  const { data: signer } = useSigner();
-
-  const fetchOptions = useCallback(async () => {
-    setLoading(true);
-
-    if (!account) {
-      setLoading(false);
-      return;
-    }
-
-    const userAccount = account.address.toLowerCase();
-
-    if (!userAccount) {
-      console.log("No user account, cannot fetch options");
-      setLoading(false);
-      return;
-    }
-
-    const userOptions = await getOptionsWithDetails(userAccount, signer);
-
-    setOptionDetailsList(userOptions);
-    setLoading(false);
-  }, [account, signer]);
+  const { options, isLoading } = useOptions();
 
   const visibleOptions = useMemo(() => {
-    const active = list === "active";
-    return optionDetailsList.filter((item) =>
-      shouldInclude(active, moment.unix(item.option.expiryTimestamp))
-    );
-  }, [list, optionDetailsList]);
+    if (!isLoading && options) {
+      const active = list === "active";
+      return options.filter((item) =>
+        shouldInclude(active, moment.unix(item.option.expiryTimestamp))
+      );
+    }
+
+    return [];
+  }, [list, options, isLoading]);
 
   useEffect(() => {
-    if (!loading) {
-      if (optionDetailsList.length > 0 && optionId) {
-        const option = optionDetailsList.find((o) => o.option.id === optionId);
-        console.log(
-          `got optionDetailsList (${optionDetailsList.length}) and option #${optionId}: ${option}`
-        );
+    if (!isLoading) {
+      if (options.length > 0 && optionId) {
+        const option = options.find((o) => o.option.id === optionId);
         setOptionDetail(option || null);
         setModalOpen(!!option);
       } else {
-        console.log(
-          `no optionDetailsList or option`,
-          JSON.stringify({ optionDetailsList, optionId })
-        );
         setModalOpen(false);
       }
     }
-  }, [optionDetailsList, optionId, loading]);
+  }, [options, optionId, isLoading]);
 
   const handleOpenOptionModal = useCallback((optionData: OptionDetails) => {
     setOptionDetail(optionData);
@@ -110,14 +62,8 @@ function Options(): JSX.Element {
     Router.push(`/vault/options?option=${optionData.option.id}`);
   }, []);
 
-  useEffect(() => {
-    if (signer) {
-      fetchOptions();
-    }
-  }, [fetchOptions, signer]);
-
   const pageBody = useMemo(() => {
-    if (loading) {
+    if (isLoading) {
       return <Loader />;
     }
     if (visibleOptions.length === 0) {
@@ -141,60 +87,13 @@ function Options(): JSX.Element {
       );
     }
     return (
-      <div className="options">
-        <ul>
-          {visibleOptions.map((optionDetail) => {
-            return (
-              <li
-                key={`item-${optionDetail?.option.id}`}
-                className={`option ${list === "expired" ? "expired" : ""}`}
-                onClick={() => handleOpenOptionModal(optionDetail)}
-              >
-                <div className="option-row">
-                  <div className="option-datapoint">
-                    <h5>Balance</h5>
-                    <h4>{optionDetail?.balance?.toNumber().toString() || 0}</h4>
-                  </div>
-                </div>
-                <div className="option-row">
-                  <div className="option-datapoint">
-                    <h5>Exercise Date</h5>
-                    <h4>{formatDate(optionDetail, "exercise")}</h4>
-                  </div>
-                  <div className="option-datapoint">
-                    <h5>Expiry Date</h5>
-                    <h4>{formatDate(optionDetail, "expiry")}</h4>
-                  </div>
-                </div>
-                <div className="option-row">
-                  <div className="option-datapoint">
-                    <h5>Underlying Asset Amount</h5>
-                    <h4>
-                      {formatAmount(optionDetail, "underlying")}{" "}
-                      <span>(x {optionDetail?.balance.toNumber() || 0})</span>
-                    </h4>
-                  </div>
-                  <div className="option-datapoint">
-                    <h5>Exercise Asset Amount</h5>
-                    <h4>
-                      {formatAmount(optionDetail, "exercise")}{" "}
-                      <span>(x {optionDetail?.balance.toNumber() || 0})</span>
-                    </h4>
-                  </div>
-                </div>
-                <Button
-                  theme="purple-blue"
-                  onClick={() => handleOpenOptionModal(optionDetail)}
-                >
-                  View Option
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <OptionsList
+        options={visibleOptions}
+        onSelect={(optionDetail) => handleOpenOptionModal(optionDetail)}
+        expired={list === "expired"}
+      />
     );
-  }, [loading, visibleOptions, list, handleOpenOptionModal]);
+  }, [isLoading, visibleOptions, list, handleOpenOptionModal]);
 
   return (
     <>
@@ -240,10 +139,7 @@ function Options(): JSX.Element {
         }}
         onClose={() => {
           setModalOpen(false);
-          Router.router.push("/vault/options").then(() => {
-            // To make sure the options are (re)loaded closing the modal
-            fetchOptions();
-          });
+          Router.router.push("/vault/options");
         }}
       />
     </>
