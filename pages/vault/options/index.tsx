@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import ConnectedRoute from "../../../components/connectedRoute";
 
 const OptionsView = dynamic(import("../../../components/optionsView"), {
   ssr: false,
@@ -6,9 +7,9 @@ const OptionsView = dynamic(import("../../../components/optionsView"), {
 
 function Options(): JSX.Element {
   return (
-    <>
+    <ConnectedRoute>
       <OptionsView />
-    </>
+    </ConnectedRoute>
   );
 }
 
