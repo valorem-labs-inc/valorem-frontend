@@ -7,7 +7,6 @@ import { useAccount, useConnect, useNetwork } from "wagmi";
 import Button from "../components/button";
 import StyledIndex from "./index.css";
 import ConnectWalletModal from "../components/connectWalletModal";
-import { useIsNetworkSupported } from "../lib/useIsNetworkSupported";
 
 const Index: NextPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
