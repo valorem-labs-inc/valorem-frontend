@@ -22,13 +22,13 @@ module.exports = {
     },
     production: {
       contract: {
-        url: "",
-        address: "",
+        url: "https://rinkeby.etherscan.io/address/0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
+        address: "0xB6645D6C55Ff3511af0Cbb24009b2635ba9A23DE",
       },
       network: {
-        chainId: 1,
-        key: "mainnet",
-        name: "Ethereum Mainnet",
+        chainId: "4",
+        key: "rinkeby",
+        name: "Rinkeby Test Network",
       },
       subgraph: {
         uri: "https://api.studio.thegraph.com/query/29509/valorem-subgraph/v0.0.1",

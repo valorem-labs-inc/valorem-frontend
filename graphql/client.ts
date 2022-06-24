@@ -76,7 +76,7 @@ export function useApollo(pageProps) {
   return store;
 }
 
-export default new ApolloClient({
-  uri: getConfigValue("subgraph.uri"),
-  cache: new InMemoryCache(),
-});
+// export default new ApolloClient({
+//   uri: getConfigValue("subgraph.uri"),
+//   cache: new InMemoryCache(),
+// });
