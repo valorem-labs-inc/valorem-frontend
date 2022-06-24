@@ -12,12 +12,14 @@ import React from "react";
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import { WagmiConfig, createClient, chain } from "wagmi";
+import { ApolloProvider } from "@apollo/client";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 
 import getConfigValue from "../lib/getConfigValue";
 import StyledApp from "./_app.css";
+import { useApollo } from "../graphql/client";
 
 const client = createClient({
   autoConnect: true,
@@ -54,18 +56,22 @@ function getYear() {
 }
 
 function App({ Component, pageProps }: AppProps) {
+  const apolloClient = useApollo(pageProps);
+
   return (
-    <StyledApp>
-      <Head>
-        <title>Valorem Options</title>
-      </Head>
-      <WagmiConfig client={client}>
-        <Component {...pageProps} />
-        <footer>
-          <p>&copy; {getYear()}, Valorem Labs Inc. All rights reserved.</p>
-        </footer>
-      </WagmiConfig>
-    </StyledApp>
+    <ApolloProvider client={apolloClient}>
+      <StyledApp>
+        <Head>
+          <title>Valorem Options</title>
+        </Head>
+        <WagmiConfig client={client}>
+          <Component {...pageProps} />
+          <footer>
+            <p>&copy; {getYear()}, Valorem Labs Inc. All rights reserved.</p>
+          </footer>
+        </WagmiConfig>
+      </StyledApp>
+    </ApolloProvider>
   );
 }
 

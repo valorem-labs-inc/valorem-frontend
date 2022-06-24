@@ -25,6 +25,7 @@
     "@toruslabs/torus-embed": "^1.21.0",
     "@walletconnect/web3-provider": "^1.7.7",
     "babel-plugin-macros": "^3.1.0",
+    "deepmerge": "^4.2.2",
     "eth-provider": "^0.10.0",
     "ethers": "^5.6.2",
     "fuse.js": "^6.5.3",
