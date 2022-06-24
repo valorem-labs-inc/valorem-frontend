@@ -25,16 +25,16 @@ const client = createClient({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({
-      chains: [chain.mainnet, chain.rinkeby],
+      chains: [chain.rinkeby],
     }),
     new WalletConnectConnector({
-      chains: [chain.mainnet, chain.rinkeby],
+      chains: [chain.rinkeby],
       options: {
         qrcode: true,
       },
     }),
     new CoinbaseWalletConnector({
-      chains: [chain.mainnet, chain.rinkeby],
+      chains: [chain.rinkeby],
       options: {
         appName: "Valorem Options",
         jsonRpcUrl: `https://mainnet.infura.io/v3/${getConfigValue(

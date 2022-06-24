@@ -25,7 +25,7 @@ function graphOptionToOption(graphOption: GraphBalanceOption): Option {
 }
 
 export function useOptions() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [options, setOptions] = useState<OptionDetails[]>([]);
 
   const { data: account } = useAccount();

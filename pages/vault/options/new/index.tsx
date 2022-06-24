@@ -1,5 +1,6 @@
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
+import ConnectedRoute from "../../../../components/connectedRoute";
 import Vault from "../../../../layouts/vault";
 
 const NewOptionView = dynamic(import("../../../../components/newOptionView"), {
@@ -8,9 +9,11 @@ const NewOptionView = dynamic(import("../../../../components/newOptionView"), {
 
 const NewOptionPage: NextPage = () => {
   return (
-    <Vault>
-      <NewOptionView />
-    </Vault>
+    <ConnectedRoute>
+      <Vault>
+        <NewOptionView />
+      </Vault>
+    </ConnectedRoute>
   );
 };
 

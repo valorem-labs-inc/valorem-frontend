@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect, useNetwork } from "wagmi";
 
 import Breadcrumbs from "../../components/breadcrumbs";
 import Button from "../../components/button";
