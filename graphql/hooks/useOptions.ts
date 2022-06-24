@@ -3,6 +3,7 @@ import { BigNumber, Contract } from "ethers";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { erc20ABI, useAccount, useProvider } from "wagmi";
+import getConfigValue from "../../lib/getConfigValue";
 import {
   GraphBalanceOption,
   GraphBalancesResponse,
@@ -25,6 +26,8 @@ function graphOptionToOption(graphOption: GraphBalanceOption): Option {
 }
 
 export function useOptions() {
+  const optionsSettlementEngineAddress = getConfigValue("contract.address");
+
   const [isLoading, setIsLoading] = useState(true);
   const [options, setOptions] = useState<OptionDetails[]>([]);
 
@@ -32,12 +35,15 @@ export function useOptions() {
 
   const provider = useProvider();
 
-  const { data: rawGraphResponse, loading: graphqlLoading } =
-    useQuery<GraphBalancesResponse>(optionsByAccountQuery, {
-      variables: {
-        account: account.address.toLowerCase(),
-      },
-    });
+  const {
+    data: rawGraphResponse,
+    loading: graphqlLoading,
+    refetch,
+  } = useQuery<GraphBalancesResponse>(optionsByAccountQuery, {
+    variables: {
+      account: account.address.toLowerCase(),
+    },
+  });
 
   const processRawGraphResponse = useCallback(async () => {
     const type1Balances = rawGraphResponse.account.ERC1155balances.filter(
@@ -56,6 +62,21 @@ export function useOptions() {
 
     const balances = await Promise.all(balanceQueries);
 
+    const allowanceQueries = type1Balances.map(({ token }) => {
+      const exerciseToken = new Contract(
+        token.option.exerciseAsset.id,
+        erc20ABI,
+        provider
+      );
+
+      return exerciseToken.allowance(
+        account.address,
+        optionsSettlementEngineAddress
+      );
+    });
+
+    const allowances = await Promise.all(allowanceQueries);
+
     const now = moment();
 
     const _options = type1Balances
@@ -68,11 +89,14 @@ export function useOptions() {
         const canExercise =
           tokenBalance.gte(option.exerciseAmount) &&
           now.isBetween(firstDate, lastDate);
+
+        const allowance = allowances[index];
+
         return {
           balance: BigNumber.from(valueExact),
           option,
           canExercise,
-          needsApproval: true,
+          needsApproval: allowance.lt(option.exerciseAmount),
         } as OptionDetails;
       })
       .sort((a, b) => {
@@ -80,8 +104,14 @@ export function useOptions() {
       });
 
     setOptions(_options);
+
     setIsLoading(false);
-  }, [rawGraphResponse, provider, account]);
+  }, [rawGraphResponse, provider, account, optionsSettlementEngineAddress]);
+
+  const refetchOptions = useCallback(async () => {
+    await refetch();
+    await processRawGraphResponse();
+  }, [processRawGraphResponse, refetch]);
 
   useEffect(() => {
     if (rawGraphResponse) {
@@ -95,5 +125,5 @@ export function useOptions() {
     }
   }, [graphqlLoading]);
 
-  return { options, isLoading };
+  return { options, isLoading, refetch: refetchOptions };
 }

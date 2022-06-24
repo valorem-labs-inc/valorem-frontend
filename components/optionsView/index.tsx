@@ -13,6 +13,9 @@ import { OptionDetails } from "../../lib/types";
 import StyledOptions from "./index.css";
 import { useOptions } from "../../graphql/hooks/useOptions";
 import OptionsList from "../optionsList";
+import { Contract } from "ethers";
+import { erc20ABI, useSigner } from "wagmi";
+import getConfigValue from "../../lib/getConfigValue";
 
 const shouldInclude = (active, checkDate: moment.Moment): boolean => {
   const now = moment();
@@ -23,6 +26,8 @@ const shouldInclude = (active, checkDate: moment.Moment): boolean => {
 };
 
 function Options(): JSX.Element {
+  const optionsSettlementEngineAddress = getConfigValue("contract.address");
+
   const [list, setList] = useState("active");
   const [optionDetail, setOptionDetail] = useState<OptionDetails | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,7 +36,9 @@ function Options(): JSX.Element {
     query: { option: optionId = "" },
   } = useRouter();
 
-  const { options, isLoading } = useOptions();
+  const { data: signer } = useSigner();
+
+  const { options, isLoading, refetch } = useOptions();
 
   const visibleOptions = useMemo(() => {
     if (!isLoading && options) {
@@ -61,6 +68,22 @@ function Options(): JSX.Element {
     setModalOpen(true);
     Router.push(`/vault/options?option=${optionData.option.id}`);
   }, []);
+
+  const handleApproveExerciseAsset = useCallback(
+    async (exerciseAsset: string) => {
+      const token = new Contract(exerciseAsset, erc20ABI, signer);
+
+      const tx = await token.approve(
+        optionsSettlementEngineAddress,
+        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      );
+
+      await tx.wait();
+
+      refetch();
+    },
+    [signer, optionsSettlementEngineAddress, refetch]
+  );
 
   const pageBody = useMemo(() => {
     if (isLoading) {
@@ -135,11 +158,12 @@ function Options(): JSX.Element {
         balance={optionDetail?.balance}
         needsApproval={optionDetail?.needsApproval}
         onApprove={() => {
-          console.log("approved - implement me");
+          handleApproveExerciseAsset(optionDetail.option.exerciseAsset);
         }}
         onClose={() => {
           setModalOpen(false);
           Router.router.push("/vault/options");
+          refetch();
         }}
       />
     </>
