@@ -47,7 +47,9 @@ function OptionModal(props: OptionModalProps): JSX.Element {
 
   const handleExerciseOption = useCallback(async () => {
     if (account && option && contract && signer) {
-      await contract.connect(signer).exercise(option.id, balance);
+      const tx = await contract.connect(signer).exercise(option.id, balance);
+
+      await tx.wait();
     }
   }, [account, balance, contract, option, signer]);
 
@@ -133,14 +135,14 @@ function OptionModal(props: OptionModalProps): JSX.Element {
             <Warning center>
               <p>
                 Approval to withdraw from your account is required in order to
-                use this option. Click &ldquo;Approve {underlyingSymbol}&rdquo;
+                use this option. Click &ldquo;Approve {exerciseSymbol}&rdquo;
                 below to complete the transaction.
               </p>
             </Warning>
           )}
           {needsApproval && (
             <Button className="approve" theme="purple-blue" onClick={onApprove}>
-              Approve {underlyingSymbol}
+              Approve {exerciseSymbol}
             </Button>
           )}
           {!needsApproval && (
