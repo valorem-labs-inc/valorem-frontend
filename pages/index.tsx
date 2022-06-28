@@ -25,23 +25,24 @@ const Index: NextPage = () => {
     }
   }, [account, router, activeChain]);
 
+  // TODO(Handle the state here where the user wallet is not yet connected correctly)
+  //         {(!activeChain || activeChain.unsupported) && (
+  //           <p className="wallet-error">
+  //             <strong>Error:</strong> Unsupported network. Double-check your
+  //             network is Rinkeby in Metamask and try again.
+  //           </p>
+  //         )}
   return (
     <Fragment>
       <StyledIndex>
         <img className="logo" src="/logo.png" alt="Valorem" />
         <Button
-          disabled={isConnecting || !activeChain || activeChain.unsupported}
+          disabled={isConnecting}
           onClick={() => setModalOpen(true)}
           theme="purple-blue"
         >
           {isConnecting ? "Connecting..." : "Connect Wallet"}
         </Button>
-        {(!activeChain || activeChain.unsupported) && (
-          <p className="wallet-error">
-            <strong>Error:</strong> Unsupported network. Double-check your
-            network is Rinkeby in Metamask and try again.
-          </p>
-        )}
       </StyledIndex>
       <ConnectWalletModal
         isOpen={modalOpen}
