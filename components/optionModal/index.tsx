@@ -39,13 +39,6 @@ function OptionModal(props: OptionModalProps): JSX.Element {
 
   const optionsSettlementEngineAddress = getConfigValue("contract.address");
 
-  // const contract = useContract({
-  //   addressOrName: optionsSettlementEngineAddress,
-  //   contractInterface: optionsSettlementEngineABI,
-  //   signerOrProvider: signer,
-
-  // });
-
   const handleExerciseOption = useCallback(async () => {
     if (account && option && signer) {
       const contract = new Contract(
