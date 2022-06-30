@@ -33,7 +33,7 @@ const Vault: React.FC = ({ children }) => {
                   {account?.address.slice(-8)}
                 </p>
               </header>
-              <Button onClick={disconnect} theme="purple-blue">
+              <Button onClick={() => disconnect()} theme="purple-blue">
                 Disconnect
               </Button>
             </div>

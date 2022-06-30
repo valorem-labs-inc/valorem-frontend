@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`button component should render 1`] = `
+.c0 {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  font-family: "Neue Montreal";
+  --webkit-font-smoothing: antialiased;
+  cursor: pointer;
+  width: auto;
+  background: var(--purple-blue);
+  color: var(--white);
+}
+
+.c0:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  background: var(--gray-500);
+}
+
+.c0:active {
+  position: relative;
+  top: 1px;
+}
+
+<button
+  class="c0"
+>
+  Hello
+</button>
+`;
