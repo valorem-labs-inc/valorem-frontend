@@ -1,6 +1,6 @@
 import React from "react";
 
-import StyledWarning from "./index.css";
+import StyledWarning from "./styled";
 
 type WarningProps = {
   center?: boolean;

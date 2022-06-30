@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useAccount, useContract, useSigner } from "wagmi";
@@ -39,19 +39,18 @@ function OptionModal(props: OptionModalProps): JSX.Element {
 
   const optionsSettlementEngineAddress = getConfigValue("contract.address");
 
-  const contract = useContract({
-    addressOrName: optionsSettlementEngineAddress,
-    contractInterface: optionsSettlementEngineABI,
-    signerOrProvider: signer,
-  });
-
   const handleExerciseOption = useCallback(async () => {
-    if (account && option && contract && signer) {
+    if (account && option && signer) {
+      const contract = new Contract(
+        optionsSettlementEngineAddress,
+        optionsSettlementEngineABI,
+        signer
+      );
       const tx = await contract.connect(signer).exercise(option.id, balance);
 
       await tx.wait();
     }
-  }, [account, balance, contract, option, signer]);
+  }, [account, balance, option, optionsSettlementEngineAddress, signer]);
 
   const exerciseSymbol = useMemo(() => {
     if (option) {

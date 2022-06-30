@@ -1,13 +1,13 @@
 import React from "react";
 
-import StyledAmount from "./index.css";
+import StyledAmount from "./styled";
 
 export type AmountProps = {
   id: string;
   label: string;
   paddingLeft: string;
   min?: string;
-  value: string;
+  value?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
