@@ -1,10 +1,10 @@
-import React, { FormEvent, Fragment, useState } from "react";
+import React, { FormEvent, Fragment, useEffect, useState } from "react";
 import { BigNumber, Contract, ethers } from "ethers";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import moment from "moment";
 import DateTime from "react-datetime";
-import { useAccount, useBalance, useContract, useSigner } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 
 import Amount from "../amount";
 import Button from "../button";
@@ -20,7 +20,7 @@ import optionsSettlementEngineABI from "../../lib/abis/optionsSettlementEngine";
 import getConfigValue from "../../lib/getConfigValue";
 import erc20ABI from "../../lib/abis/erc20";
 import { handleApproveToken } from "../../lib/utilities";
-import StyledNewOption from "./index.css";
+import StyledNewOption from "./styled";
 
 const NewOptionView: NextPage = () => {
   const NOW = moment().unix();
@@ -48,24 +48,18 @@ const NewOptionView: NextPage = () => {
   const { data: signer } = useSigner();
   const { data: account } = useAccount();
 
-  const contract = useContract({
-    addressOrName: optionsSettlementEngineAddress,
-    contractInterface: optionsSettlementEngineABI,
-    signerOrProvider: signer,
-  });
+  const [underlyingBalance, setUnderlyingBalance] = useState(BigNumber.from(0));
 
-  const underlyingContract = useContract({
-    addressOrName:
-      underlyingAsset || "0x0000000000000000000000000000000000000000",
-    contractInterface: erc20ABI,
-    signerOrProvider: signer,
-  });
-
-  const { data: underlyingBalance } = useBalance({
-    addressOrName: account?.address,
-    token: underlyingAsset,
-    enabled: account && underlyingAsset !== "",
-  });
+  useEffect(() => {
+    async function updateUnderlyingBalance() {
+      const token = new Contract(underlyingAsset, erc20ABI, signer);
+      const balance = await token.balanceOf(account.address);
+      setUnderlyingBalance(balance);
+    }
+    if (underlyingAsset !== "") {
+      updateUnderlyingBalance();
+    }
+  }, [underlyingAsset, signer, account]);
 
   function makeOptionObject() {
     return {
@@ -81,13 +75,17 @@ const NewOptionView: NextPage = () => {
   }
 
   async function handleWriteContract() {
+    const contract = new Contract(
+      optionsSettlementEngineAddress,
+      optionsSettlementEngineABI,
+      signer
+    );
+
     const option = makeOptionObject();
 
     const totalUnderlyingAmount = underlyingAmount.mul(balance);
 
-    const hasRequiredBalance = underlyingBalance.value.gte(
-      totalUnderlyingAmount
-    );
+    const hasRequiredBalance = underlyingBalance.gte(totalUnderlyingAmount);
 
     if (!hasRequiredBalance) {
       setBalanceTooLow(true);
@@ -95,6 +93,8 @@ const NewOptionView: NextPage = () => {
       setWriteWarning("Balance of underlying asset too low to write.");
       return;
     }
+
+    const underlyingContract = new Contract(underlyingAsset, erc20ABI, signer);
 
     const allowance = await underlyingContract.allowance(
       account.address,
@@ -128,6 +128,12 @@ const NewOptionView: NextPage = () => {
     optionId: string,
     numberOfContracts: BigNumber = BigNumber.from(0)
   ) {
+    const contract = new Contract(
+      optionsSettlementEngineAddress,
+      optionsSettlementEngineABI,
+      signer
+    );
+
     const tx = await contract.write(optionId, numberOfContracts);
 
     await tx.wait();
@@ -171,7 +177,7 @@ const NewOptionView: NextPage = () => {
             <div className="contract-options">
               <div className="form-row">
                 <div className="form-input-group">
-                  <label htmlFor="balance">Number of Contracts</label>
+                  <label htmlFor="numContracts">Number of Contracts</label>
                   <Amount
                     id="numContracts"
                     label="#"
@@ -180,7 +186,11 @@ const NewOptionView: NextPage = () => {
                     onChange={(event) => {
                       let nextBalance = 0;
                       try {
-                        nextBalance = parseInt(event.target.value, 10);
+                        if (event.target.value === "") {
+                          nextBalance = 0;
+                        } else {
+                          nextBalance = parseInt(event.target.value, 10);
+                        }
                       } catch {
                         nextBalance = 0;
                       }

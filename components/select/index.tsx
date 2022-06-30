@@ -4,7 +4,7 @@ import _ from "lodash";
 import React from "react";
 
 import AngleDown from "../icons/AngleDown";
-import StyledSelect from "./index.css";
+import StyledSelect from "./styled";
 
 type Option = {
   label: string;
