@@ -66,9 +66,6 @@ function App({ Component, pageProps }: AppProps) {
         </Head>
         <WagmiConfig client={client}>
           <Component {...pageProps} />
-          <footer>
-            <p>&copy; {getYear()}, Valorem Labs Inc. All rights reserved.</p>
-          </footer>
         </WagmiConfig>
       </StyledApp>
     </ApolloProvider>

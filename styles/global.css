@@ -52,7 +52,6 @@ html > body > #__next > div {
 body {
   font-family: "Neue Montreal", "Helvetica Neue", "Helvetica", "Arial",
     sans-serif;
-  background: var(--gray-200);
 }
 
 em {
