@@ -128,9 +128,9 @@ const Option = styled.button<{ selected?: boolean }>`
 const ConnectWalletView: FC = () => {
   const [canLaunch, setCanLaunch] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
 
-  const { connector: activeConnector } = useAccount();
+  let { connector: activeConnector } = useAccount();
+  // TODO(onMutate, we should tell the user we are attempting to connect)
   const { connect, connectors, reset } = useConnect({
     onError: () => {
       setShowWarning(true);
@@ -159,7 +159,7 @@ const ConnectWalletView: FC = () => {
         <h1>Connect wallet</h1>
         <p>
           Sign into the Valorem app by connecting your wallet. Our app is still
-          in beta mode, so you can only connect to the Rinkeby test network.
+          in beta mode, so you can only connect with the Rinkeby test network.
         </p>
       </div>
       {showWarning && (
@@ -178,9 +178,10 @@ const ConnectWalletView: FC = () => {
               />
             </svg>
           </div>
+          {/* TODO(Correctly set value of wallet and network on selector clicks) */}
           <p>
-            Failed to connect to Rinkeby network with MetaMask wallet. Please
-            try again.
+            Failed to connect to {chain?.name || "network"} with{" "}
+            {activeConnector?.name || "wallet"}. Please try again.
           </p>
         </div>
       )}
@@ -193,6 +194,9 @@ const ConnectWalletView: FC = () => {
               key={connector.id}
               onClick={() => {
                 if (activeConnector?.id !== connector.id) {
+                  {
+                    /* TODO(While attemting to connect, before a failure occurs) */
+                  }
                   connect({ connector });
                 }
               }}
@@ -237,7 +241,7 @@ const ConnectWalletView: FC = () => {
               <img alt="Rinkeby logo" src="/rinkeby-logo.png" />
             </div>
             <p>Rinkeby</p>
-            <p className="subheading">Learn to use Valorem with fake money</p>
+            <p className="subheading">Learn to use Valorem with fake tokens</p>
           </Option>
           <Option disabled data-testid="network-select--mainnet">
             <div className="icon">
@@ -245,7 +249,7 @@ const ConnectWalletView: FC = () => {
             </div>
             <p>Ethereum Mainnet</p>
             <p className="subheading">
-              Write and trade options using real money
+              Write and trade options using real tokens
             </p>
           </Option>
         </div>
