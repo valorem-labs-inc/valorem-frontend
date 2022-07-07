@@ -21,7 +21,7 @@ import StyledApp from "./_app.css";
 import { useApollo } from "../graphql/client";
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [chain.mainnet, chain.rinkeby],
+  [chain.rinkeby],
   [publicProvider()]
 );
 
