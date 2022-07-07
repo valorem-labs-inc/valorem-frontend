@@ -4,6 +4,7 @@ import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
 import Button from "../button";
+import { disconnect, ConnectorAlreadyConnectedError } from "@wagmi/core";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -128,8 +129,7 @@ const Option = styled.button<{ selected?: boolean }>`
 const ConnectWalletView: FC = () => {
   const [canLaunch, setCanLaunch] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-
-  let { connector: activeConnector } = useAccount();
+  const { isConnected, connector: activeConnector } = useAccount();
   // TODO(onMutate, we should tell the user we are attempting to connect)
   const { connect, connectors, reset } = useConnect({
     onError: () => {
@@ -146,7 +146,7 @@ const ConnectWalletView: FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (activeConnector && chain && !chain.unsupported) {
+    if (activeConnector && chain && !chain.unsupported && isConnected) {
       setCanLaunch(true);
     } else {
       setCanLaunch(false);
@@ -193,14 +193,13 @@ const ConnectWalletView: FC = () => {
               data-testid="wallet-option"
               key={connector.id}
               onClick={() => {
-                if (activeConnector?.id !== connector.id) {
-                  {
-                    /* TODO(While attemting to connect, before a failure occurs) */
-                  }
+                if (isConnected && activeConnector?.id === connector.id) {
+                  disconnect().then();
+                } else {
                   connect({ connector });
                 }
               }}
-              selected={activeConnector && activeConnector.id === connector.id}
+              selected={isConnected && activeConnector?.id === connector.id}
             >
               {activeConnector && activeConnector.id === connector.id && (
                 <img
