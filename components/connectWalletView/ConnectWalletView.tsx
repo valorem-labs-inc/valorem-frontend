@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
 import Button from "../button";
-import { disconnect, ConnectorAlreadyConnectedError } from "@wagmi/core";
+import { disconnect } from "@wagmi/core";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -131,6 +131,7 @@ const ConnectWalletView: FC = () => {
   const [showWarning, setShowWarning] = useState(false);
   const { isConnected, connector: activeConnector } = useAccount();
   // TODO(onMutate, we should tell the user we are attempting to connect)
+  // The way to do this might be to grey out and draw a loading animation over the connection view
   const { connect, connectors, reset } = useConnect({
     onError: () => {
       setShowWarning(true);
@@ -178,7 +179,6 @@ const ConnectWalletView: FC = () => {
               />
             </svg>
           </div>
-          {/* TODO(Correctly set value of wallet and network on selector clicks) */}
           <p>
             Failed to connect to {chain?.name || "network"} with{" "}
             {activeConnector?.name || "wallet"}. Please try again.
@@ -224,7 +224,14 @@ const ConnectWalletView: FC = () => {
         <h2>Select Network</h2>
         <div className="options">
           <Option
-            onClick={() => switchNetwork(4)}
+            disabled={!isConnected}
+            onClick={() => {
+              if (typeof switchNetwork === "function") {
+                switchNetwork(4);
+              } else {
+                // TODO(Draw warning here that the user needs to manually select network)
+              }
+            }}
             selected={chain && chain.id === 4}
             data-testid="network-select--rinkeby"
           >
