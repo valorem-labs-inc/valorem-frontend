@@ -1,16 +1,51 @@
 import * as React from "react";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { render, RenderOptions } from "@testing-library/react";
-import { getDefaultProvider, Wallet, providers } from "ethers";
+import { Wallet, providers } from "ethers";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 import { MockConnector } from "@wagmi/core/connectors/mock";
-import { sign } from "crypto";
-import { JsonRpcSigner } from "@ethersproject/providers";
 
-const { chains, provider } = configureChains(
+interface RenderHookOptions<Props> {
+  initialProps?: Props;
+  wrapper?: React.JSXElementConstructor<{ children: React.ReactElement }>;
+}
+
+function renderHook<Result, Props>(
+  renderCallback: (initialProps: Props) => Result,
+  options: RenderHookOptions<Props> = {}
+) {
+  const { initialProps } = options;
+
+  const result = React.createRef<Result>();
+
+  function TestComponent({ renderCallbackProps }) {
+    const pendingResult = renderCallback(renderCallbackProps);
+
+    React.useEffect(() => {
+      // @ts-ignore
+      result.current = pendingResult;
+    });
+
+    return null;
+  }
+
+  const { rerender: baseRerender, unmount } = render(
+    <TestComponent renderCallbackProps={initialProps} />
+  );
+
+  function rerender(rerenderCallbackProps) {
+    return baseRerender(
+      <TestComponent renderCallbackProps={rerenderCallbackProps} />
+    );
+  }
+
+  return { result, rerender, unmount };
+}
+
+const { chains, provider, webSocketProvider } = configureChains(
   [chain.rinkeby],
   [
+    // publicProvider(),
     jsonRpcProvider({
       rpc: (chain) => ({
         http: "http://127.0.0.1:8545",
@@ -19,30 +54,32 @@ const { chains, provider } = configureChains(
   ]
 );
 
-function getSigner() {
-  const p = new providers.JsonRpcProvider("http://127.0.0.1:8545");
-
-  const wallet = new Wallet(
-    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-  );
-
-  return p.getSigner(wallet.address);
-}
-
-const mockConnector = new MockConnector({
-  chains,
-  options: {
-    signer: getSigner(),
-  },
-});
-
-const client = createClient({
-  autoConnect: true,
-  connectors: [mockConnector],
-  provider,
-});
-
 const AllTheProviders: React.FC = ({ children }) => {
+  function getSigner() {
+    const p = new providers.JsonRpcProvider("http://127.0.0.1:8545");
+
+    const wallet = new Wallet(
+      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    );
+
+    return p.getSigner(wallet.address);
+  }
+
+  const mockConnector = new MockConnector({
+    chains,
+    options: {
+      chainId: 4,
+      signer: getSigner(),
+    },
+  });
+
+  const client = createClient({
+    // autoConnect: true,
+    connectors: [mockConnector],
+    provider,
+    webSocketProvider,
+  });
+
   return <WagmiConfig client={client}>{children}</WagmiConfig>;
 };
 

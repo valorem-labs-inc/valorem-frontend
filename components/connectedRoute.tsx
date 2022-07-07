@@ -5,7 +5,7 @@ import { useNetwork } from "wagmi";
 const ConnectedRoute: FC = ({ children }) => {
   const router = useRouter();
 
-  const { activeChain } = useNetwork();
+  const { chain: activeChain } = useNetwork();
 
   useEffect(() => {
     if (!activeChain || activeChain.unsupported) {

@@ -10,15 +10,15 @@ import StyledVault from "./index.css";
 const Vault: React.FC = ({ children }) => {
   const router = useRouter();
 
-  const { data: account } = useAccount();
+  const { address } = useAccount();
 
   const { disconnect } = useDisconnect();
 
   useEffect(() => {
-    if (!account) {
+    if (!address) {
       router.push("/");
     }
-  }, [account, router]);
+  }, [address, router]);
 
   return (
     <StyledVault>
@@ -29,8 +29,8 @@ const Vault: React.FC = ({ children }) => {
               <header>
                 <h5>Connected As</h5>
                 <p>
-                  {account?.address.substring(0, 8)}...
-                  {account?.address.slice(-8)}
+                  {address.substring(0, 8)}...
+                  {address.slice(-8)}
                 </p>
               </header>
               <Button onClick={() => disconnect()} theme="purple-blue">

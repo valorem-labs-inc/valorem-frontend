@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { BigNumber, Contract } from "ethers";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
-import { erc20ABI, useAccount, useProvider } from "wagmi";
+import { erc20ABI, useAccount, useNetwork, useProvider } from "wagmi";
 import getConfigValue from "../../lib/getConfigValue";
 import {
   GraphBalanceOption,
@@ -31,7 +31,8 @@ export function useOptions() {
   const [isLoading, setIsLoading] = useState(true);
   const [options, setOptions] = useState<OptionDetails[]>([]);
 
-  const { data: account } = useAccount();
+  const { address } = useAccount();
+  const { chain } = useNetwork();
 
   const provider = useProvider();
 
@@ -41,7 +42,7 @@ export function useOptions() {
     refetch,
   } = useQuery<GraphBalancesResponse>(optionsByAccountQuery, {
     variables: {
-      account: account.address.toLowerCase(),
+      account: address.toLowerCase(),
     },
   });
 
@@ -57,7 +58,7 @@ export function useOptions() {
         provider
       );
 
-      return tokenContract.balanceOf(account.address);
+      return tokenContract.balanceOf(address);
     });
 
     const balances = await Promise.all(balanceQueries);
@@ -69,10 +70,7 @@ export function useOptions() {
         provider
       );
 
-      return exerciseToken.allowance(
-        account.address,
-        optionsSettlementEngineAddress
-      );
+      return exerciseToken.allowance(address, optionsSettlementEngineAddress);
     });
 
     const allowances = await Promise.all(allowanceQueries);
@@ -106,7 +104,7 @@ export function useOptions() {
     setOptions(_options);
 
     setIsLoading(false);
-  }, [rawGraphResponse, provider, account, optionsSettlementEngineAddress]);
+  }, [rawGraphResponse, provider, address, optionsSettlementEngineAddress]);
 
   const refetchOptions = useCallback(async () => {
     await refetch();
@@ -114,10 +112,10 @@ export function useOptions() {
   }, [processRawGraphResponse, refetch]);
 
   useEffect(() => {
-    if (rawGraphResponse) {
+    if (rawGraphResponse && !chain.unsupported) {
       processRawGraphResponse();
     }
-  }, [rawGraphResponse, processRawGraphResponse]);
+  }, [rawGraphResponse, processRawGraphResponse, chain]);
 
   useEffect(() => {
     if (graphqlLoading) {
