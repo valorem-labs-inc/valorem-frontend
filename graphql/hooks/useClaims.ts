@@ -28,13 +28,13 @@ export function useClaims() {
   const [isLoading, setIsLoading] = useState(true);
   const [claims, setClaims] = useState<Claim[]>([]);
 
-  const { data: account } = useAccount();
+  const { address } = useAccount();
 
   const { data: rawGraphResponse, loading: graphqlLoading } = useQuery(
     claimsQuery,
     {
       variables: {
-        account: account.address.toLowerCase(),
+        account: address.toLowerCase(),
       },
     }
   );

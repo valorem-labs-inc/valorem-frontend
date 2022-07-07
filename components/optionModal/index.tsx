@@ -34,13 +34,13 @@ function OptionModal(props: OptionModalProps): JSX.Element {
     onClose,
     onApprove,
   } = props;
-  const { data: account } = useAccount();
+  const { address } = useAccount();
   const { data: signer } = useSigner();
 
   const optionsSettlementEngineAddress = getConfigValue("contract.address");
 
   const handleExerciseOption = useCallback(async () => {
-    if (account && option && signer) {
+    if (address && option && signer) {
       const contract = new Contract(
         optionsSettlementEngineAddress,
         optionsSettlementEngineABI,
@@ -50,7 +50,7 @@ function OptionModal(props: OptionModalProps): JSX.Element {
 
       await tx.wait();
     }
-  }, [account, balance, option, optionsSettlementEngineAddress, signer]);
+  }, [address, balance, option, optionsSettlementEngineAddress, signer]);
 
   const exerciseSymbol = useMemo(() => {
     if (option) {

@@ -21,7 +21,7 @@ function ClaimModal(props: ClaimProps): JSX.Element {
 
   const { claim, onClose, open } = props;
 
-  const { data: account } = useAccount();
+  const { address } = useAccount();
   const { data: signer } = useSigner();
 
   const optionsSettlementEngineAddress = getConfigValue("contract.address");
@@ -32,27 +32,23 @@ function ClaimModal(props: ClaimProps): JSX.Element {
     signerOrProvider: signer,
   });
 
-  const { data: claimBalance } = useContractRead(
-    {
-      addressOrName: optionsSettlementEngineAddress,
-      contractInterface: optionsSettlementEngineABI,
-    },
-    "balanceOf",
-    {
-      args: [account?.address.toLowerCase(), claim.id],
-    }
-  );
+  const { data: claimBalance } = useContractRead({
+    addressOrName: optionsSettlementEngineAddress,
+    contractInterface: optionsSettlementEngineABI,
+    functionName: "balanceOf",
+    args: [address.toLowerCase(), claim.id],
+  });
 
   useEffect(() => {
     setHasClaim(claimBalance.toNumber() === 1 ? true : false);
   }, [claimBalance]);
 
   const handleRedeemClaim = useCallback(async () => {
-    if (account) {
+    if (address) {
       await contract.connect(signer).redeem(claim.id);
     }
     onClose();
-  }, [account, claim.id, contract, onClose, signer]);
+  }, [address, claim.id, contract, onClose, signer]);
 
   const modalBody = useMemo(() => {
     if (loading) {
