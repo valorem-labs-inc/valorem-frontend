@@ -50,6 +50,7 @@ html > body > #__next > div {
 }
 
 body,
+p,
 button {
   font-family: "Neue Montreal", "Helvetica Neue", "Helvetica", "Arial",
     sans-serif;
