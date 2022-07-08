@@ -60,6 +60,12 @@ const Wrapper = styled.div`
     width: 100%;
   }
 
+  ${Button}:not(:disabled) {
+    animation: connect-wallet-button 3s infinite;
+    transition: transform 0.3s ease-in-out;
+    transform: scale(1, 1);
+  }
+
   .error {
     background-color: #e2b3b3;
     border-radius: 8px;
