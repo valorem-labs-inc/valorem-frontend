@@ -132,6 +132,10 @@ const ConnectWalletView: FC = () => {
   const { isConnected, connector: activeConnector } = useAccount();
   // TODO(onMutate, we should tell the user we are attempting to connect)
   // The way to do this might be to grey out and draw a loading animation over the connection view
+  // TODO(When network selection is unsupported by the wallet, we should display an amber warning for the user)
+  // to make the selection themselves
+  // TODO(Figure out why frame masquerading as metamask gets "Error: not connected" after 8s)
+  // Low priority though, since not officially supported
   const { connect, connectors, reset } = useConnect({
     onError: () => {
       setShowError(true);
@@ -194,13 +198,18 @@ const ConnectWalletView: FC = () => {
               disabled={!connector.ready}
               key={connector.id}
               onClick={() => {
-                if (isConnected && activeConnector?.id === connector.id) {
+                if (
+                  activeConnector &&
+                  activeConnector.id === connector.id &&
+                  isConnected
+                ) {
+                  // The user is pressing the selected connector, lets disconnect
                   disconnect().then();
                 } else {
                   connect({ connector });
                 }
               }}
-              selected={isConnected && activeConnector?.id === connector.id}
+              selected={activeConnector && activeConnector.id === connector.id}
             >
               {activeConnector && activeConnector.id === connector.id && (
                 <img
@@ -223,18 +232,18 @@ const ConnectWalletView: FC = () => {
       </div>
       <div className="step">
         <h2>Select Network</h2>
-        {/* TODO(Draw yellow warning here that the user needs to manually select network if feature is disabled) */}
         <div className="options">
-          {/* TODO(useSwitchChain should really handle this if it's not supported, seems borked) */}
           <Option
-            disabled={!isConnected || typeof switchNetwork !== "function"}
+            disabled={!isConnected || (!switchNetwork && chain.id !== 4)}
             onClick={() => {
-              switchNetwork(4);
+              if (chain.id !== 4 && typeof switchNetwork === "function") {
+                switchNetwork(4);
+              }
             }}
-            selected={chain && chain.id === 4}
+            selected={chain?.id === 4}
             data-testid="network-select--rinkeby"
           >
-            {chain && chain.id === 4 && (
+            {chain?.id === 4 && (
               <img
                 alt=""
                 data-testid="selected-indicator"
