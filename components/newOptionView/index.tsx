@@ -46,20 +46,20 @@ const NewOptionView: NextPage = () => {
   const router = useRouter();
 
   const { data: signer } = useSigner();
-  const { data: account } = useAccount();
+  const { address } = useAccount();
 
   const [underlyingBalance, setUnderlyingBalance] = useState(BigNumber.from(0));
 
   useEffect(() => {
     async function updateUnderlyingBalance() {
       const token = new Contract(underlyingAsset, erc20ABI, signer);
-      const balance = await token.balanceOf(account.address);
+      const balance = await token.balanceOf(address);
       setUnderlyingBalance(balance);
     }
-    if (underlyingAsset !== "") {
+    if (underlyingAsset !== "" && address) {
       updateUnderlyingBalance();
     }
-  }, [underlyingAsset, signer, account]);
+  }, [underlyingAsset, signer, address]);
 
   function makeOptionObject() {
     return {
@@ -97,7 +97,7 @@ const NewOptionView: NextPage = () => {
     const underlyingContract = new Contract(underlyingAsset, erc20ABI, signer);
 
     const allowance = await underlyingContract.allowance(
-      account.address,
+      address,
       optionsSettlementEngineAddress
     );
 

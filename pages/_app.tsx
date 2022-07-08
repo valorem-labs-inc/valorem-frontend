@@ -11,38 +11,35 @@ import "../styles/animations.css";
 import React from "react";
 import Head from "next/head";
 import type { AppProps } from "next/app";
-import { WagmiConfig, createClient, chain } from "wagmi";
 import { ApolloProvider } from "@apollo/client";
+import { WagmiConfig, createClient, chain, configureChains } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 
-import getConfigValue from "../lib/getConfigValue";
 import StyledApp from "./_app.css";
 import { useApollo } from "../graphql/client";
+
+const { chains, provider, webSocketProvider } = configureChains(
+  [chain.rinkeby],
+  [publicProvider()]
+);
 
 const client = createClient({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({
-      chains: [chain.rinkeby],
+      chains,
     }),
     new WalletConnectConnector({
-      chains: [chain.rinkeby],
+      chains,
       options: {
         qrcode: true,
       },
     }),
-    new CoinbaseWalletConnector({
-      chains: [chain.rinkeby],
-      options: {
-        appName: "Valorem Options",
-        jsonRpcUrl: `https://mainnet.infura.io/v3/${getConfigValue(
-          "infura.projectId"
-        )}`,
-      },
-    }),
   ],
+  provider,
+  webSocketProvider,
 });
 
 function getYear() {
@@ -60,17 +57,17 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <StyledApp>
-        <Head>
-          <title>Valorem Options</title>
-        </Head>
-        <WagmiConfig client={client}>
+      <WagmiConfig client={client}>
+        <StyledApp>
+          <Head>
+            <title>Valorem Options</title>
+          </Head>
           <Component {...pageProps} />
           <footer>
             <p>&copy; {getYear()}, Valorem Labs Inc. All rights reserved.</p>
           </footer>
-        </WagmiConfig>
-      </StyledApp>
+        </StyledApp>
+      </WagmiConfig>
     </ApolloProvider>
   );
 }

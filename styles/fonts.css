@@ -15,3 +15,19 @@
   font-style: italic;
   font-weight: 500;
 }
+
+@font-face {
+  font-family: "Styrene A";
+  src: url("/fonts/StyreneA-Light-Web.woff2") format("woff2"),
+    url("/fonts/StyreneA-Light-Web.woff") format("woff");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Styrene A";
+  src: url("/fonts/StyreneA-LightItalic-Web.woff2") format("woff2"),
+    url("/fonts/StyreneA-LightItalic-Web.woff") format("woff");
+  font-style: italic;
+  font-weight: 500;
+}
