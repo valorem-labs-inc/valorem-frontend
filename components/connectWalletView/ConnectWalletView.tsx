@@ -12,19 +12,18 @@ import {
 import Button from "../button";
 
 const Wrapper = styled.div`
-  margin: 0 auto;
-  max-width: 460px;
-  padding: 0px 16px;
+  margin: 0px auto;
+  max-width: 588px;
+  padding: 48px 64px;
 
   .directions {
-    padding-bottom: 24px;
-    padding-top: 52px;
     text-align: center;
   }
 
   .directions h1 {
     font-family: "Styrene A", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     color: #111f2e; // black
+    font-weight: 300;
     font-size: 32px;
     letter-spacing: -0.06em;
     line-height: 1.1;
@@ -35,10 +34,11 @@ const Wrapper = styled.div`
     font-size: 16px;
     line-height: 1.6;
     color: var(--gray-700);
+    margin-bottom: 16px;
   }
 
   .step {
-    padding: 24px 0;
+    margin: 32px 0 0 0;
     text-align: center;
   }
 
@@ -172,7 +172,7 @@ const ConnectWalletView: FC = () => {
         <h1>Connect wallet</h1>
         <p>
           Sign into the Valorem app by connecting your wallet. Our app is still
-          in beta mode, so you can only connect with the Rinkeby test network.
+          in beta, so you can only connect with the Rinkeby test network.
         </p>
       </div>
       {showError && (
