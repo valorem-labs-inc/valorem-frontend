@@ -2,7 +2,13 @@
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
-import { useAccount, useConnect, useNetwork, useSwitchNetwork, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useConnect,
+  useNetwork,
+  useSwitchNetwork,
+  useDisconnect,
+} from "wagmi";
 import Button from "../button";
 
 const Wrapper = styled.div`
@@ -145,7 +151,7 @@ const ConnectWalletView: FC = () => {
     },
   });
 
-  const { disconnect } = useDisconnect()
+  const { disconnect } = useDisconnect();
 
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
