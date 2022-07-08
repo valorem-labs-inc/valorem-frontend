@@ -2,9 +2,8 @@
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
-import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
+import { useAccount, useConnect, useNetwork, useSwitchNetwork, useDisconnect } from "wagmi";
 import Button from "../button";
-import { disconnect } from "@wagmi/core";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -145,6 +144,9 @@ const ConnectWalletView: FC = () => {
       setShowError(false);
     },
   });
+
+  const { disconnect } = useDisconnect()
+
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
 
@@ -204,7 +206,7 @@ const ConnectWalletView: FC = () => {
                   isConnected
                 ) {
                   // The user is pressing the selected connector, lets disconnect
-                  disconnect().then();
+                  disconnect();
                 } else {
                   connect({ connector });
                 }
