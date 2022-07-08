@@ -8,7 +8,6 @@ const Wrapper = styled.nav`
 
   .inner {
     align-items: center;
-    display: flex;
     height: 84px;
     padding: 0 16px;
     margin: 0 auto;
