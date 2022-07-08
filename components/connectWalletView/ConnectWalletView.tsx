@@ -62,7 +62,7 @@ const Wrapper = styled.div`
     width: 100%;
   }
 
-  .warning {
+  .error {
     background-color: #e2b3b3;
     border-radius: 8px;
     color: #654040;
@@ -128,17 +128,17 @@ const Option = styled.button<{ selected?: boolean }>`
 
 const ConnectWalletView: FC = () => {
   const [canLaunch, setCanLaunch] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
+  const [showError, setShowError] = useState(false);
   const { isConnected, connector: activeConnector } = useAccount();
   // TODO(onMutate, we should tell the user we are attempting to connect)
   // The way to do this might be to grey out and draw a loading animation over the connection view
   const { connect, connectors, reset } = useConnect({
     onError: () => {
-      setShowWarning(true);
+      setShowError(true);
       reset();
     },
     onSuccess: () => {
-      setShowWarning(false);
+      setShowError(false);
     },
   });
   const { chain } = useNetwork();
@@ -163,8 +163,8 @@ const ConnectWalletView: FC = () => {
           in beta mode, so you can only connect with the Rinkeby test network.
         </p>
       </div>
-      {showWarning && (
-        <div className="warning">
+      {showError && (
+        <div className="error">
           <div>
             <svg
               width="24"
@@ -191,6 +191,7 @@ const ConnectWalletView: FC = () => {
           {connectors.map((connector) => (
             <Option
               data-testid="wallet-option"
+              disabled={!connector.ready}
               key={connector.id}
               onClick={() => {
                 if (isConnected && activeConnector?.id === connector.id) {
@@ -222,15 +223,13 @@ const ConnectWalletView: FC = () => {
       </div>
       <div className="step">
         <h2>Select Network</h2>
+        {/* TODO(Draw yellow warning here that the user needs to manually select network if feature is disabled) */}
         <div className="options">
+          {/* TODO(useSwitchChain should really handle this if it's not supported, seems borked) */}
           <Option
-            disabled={!isConnected}
+            disabled={!isConnected || typeof switchNetwork !== "function"}
             onClick={() => {
-              if (typeof switchNetwork === "function") {
-                switchNetwork(4);
-              } else {
-                // TODO(Draw warning here that the user needs to manually select network)
-              }
+              switchNetwork(4);
             }}
             selected={chain && chain.id === 4}
             data-testid="network-select--rinkeby"
