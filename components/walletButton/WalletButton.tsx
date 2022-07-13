@@ -45,14 +45,19 @@ const Button = styled.button`
 `;
 
 const WalletButton: FC = () => {
-  const { address } = useAccount();
+  const { address, connector } = useAccount();
 
-  // TODO: Should dynamically display icon based on what wallet is connected
+  if (!connector) {
+    return null;
+  }
 
   return (
-    <Button>
+    <Button data-testid="WalletButton">
       <div className="status-container">
-        <img src="/metamask.svg" alt="MetaMask logo" />
+        <img
+          src={`/${connector.name.toLowerCase()}.svg`}
+          alt={`${connector.name} logo`}
+        />
       </div>
       <span>{formatAddress(address)}</span>
     </Button>

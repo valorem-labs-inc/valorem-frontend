@@ -2,8 +2,34 @@ import * as React from "react";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { render, RenderOptions } from "@testing-library/react";
 import { Wallet, providers } from "ethers";
-import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import {
+  chain,
+  configureChains,
+  createClient,
+  useAccount,
+  useConnect,
+  WagmiConfig,
+} from "wagmi";
 import { MockConnector } from "@wagmi/core/connectors/mock";
+
+export const AutoConnect: React.FC = ({ children }) => {
+  const { isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
+
+  React.useEffect(() => {
+    if (!isConnected) {
+      connect({
+        connector: connectors[0],
+      });
+    }
+  }, [isConnected, connect, connectors]);
+
+  if (!isConnected) {
+    return null;
+  }
+
+  return <>{children}</>;
+};
 
 interface RenderHookOptions<Props> {
   initialProps?: Props;
