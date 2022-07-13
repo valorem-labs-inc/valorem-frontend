@@ -13,7 +13,6 @@ function getYear() {
 }
 
 const Wrapper = styled.div`
-  /* background-color: red; */
   min-height: 100vh;
 
   display: flex;
