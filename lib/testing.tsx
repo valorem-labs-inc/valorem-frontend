@@ -36,7 +36,7 @@ interface RenderHookOptions<Props> {
   wrapper?: React.JSXElementConstructor<{ children: React.ReactElement }>;
 }
 
-function renderHook<Result, Props>(
+export function renderHook<Result, Props>(
   renderCallback: (initialProps: Props) => Result,
   options: RenderHookOptions<Props> = {}
 ) {

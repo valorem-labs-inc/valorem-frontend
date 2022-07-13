@@ -48,12 +48,19 @@ const Button = styled.button`
   }
 `;
 
+function getLogoUrl(chainID: number) {
+  if (chainID === 4) {
+    return "rinkeby-logo.png";
+  }
+  return "mainnet-logo.png";
+}
+
 const NetworkButton: FC = () => {
   const { chain } = useNetwork();
 
   return (
-    <Button>
-      <img src="/rinkeby-logo.png" alt="Rinkeby logo" />
+    <Button data-testid="NetworkButton">
+      <img src={getLogoUrl(chain.id)} alt={`${chain.name} logo`} />
       <span>{chain && chain.name}</span>
       <span>
         <svg
