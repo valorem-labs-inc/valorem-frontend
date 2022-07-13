@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { FC } from "react";
 import styled from "styled-components";
 import { useAccount } from "wagmi";
@@ -11,9 +12,11 @@ const Wrapper = styled.div`
 `;
 
 const NavBarActions: FC = () => {
+  const router = useRouter();
+
   const { isConnected } = useAccount();
 
-  if (!isConnected) {
+  if (!isConnected || router.route === "") {
     return null;
   }
 
