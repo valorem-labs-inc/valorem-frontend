@@ -1,18 +1,34 @@
-import Router from "next/router";
-import React from "react";
+import { NextPage } from "next";
+import dynamic from "next/dynamic";
+import NavBar from "../../components/navbar";
+import VaultNavigation from "../../components/vaultNavigation";
 
-type VaultProps = {
-  //  none
+const VaultView = dynamic(() => import("../../components/vaultView"), {
+  ssr: false,
+});
+
+const Vault: NextPage = () => {
+  return (
+    <div>
+      <NavBar />
+      <div
+        style={{
+          display: "flex",
+          maxWidth: "1224px",
+          margin: "64px auto",
+          padding: "0 16px",
+          gap: "48px",
+        }}
+      >
+        <div style={{ width: "270px" }}>
+          <VaultNavigation />
+        </div>
+        <div style={{ flex: "1" }}>
+          <VaultView />
+        </div>
+      </div>
+    </div>
+  );
 };
-
-class Vault extends React.Component<VaultProps> {
-  componentDidMount() {
-    Router.push("/vault/options");
-  }
-
-  render() {
-    return <></>;
-  }
-}
 
 export default Vault;

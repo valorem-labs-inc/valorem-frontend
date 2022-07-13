@@ -1,6 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
+import dynamic from "next/dynamic";
 import { FC } from "react";
 import styled from "styled-components";
+
+const Actions = dynamic(() => import("./NavBarActions"), {
+  ssr: false,
+});
 
 const Wrapper = styled.nav`
   background-color: #fff;
@@ -9,6 +14,7 @@ const Wrapper = styled.nav`
   .inner {
     align-items: center;
     display: flex;
+    justify-content: space-between;
     height: 84px;
     padding: 0 16px;
     margin: 0 auto;
@@ -25,6 +31,7 @@ const NavBar: FC = () => {
     <Wrapper>
       <div className="inner">
         <img className="logo" alt="Valorem logo" src="/logo.png" />
+        <Actions />
       </div>
     </Wrapper>
   );
