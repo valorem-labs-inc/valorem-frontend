@@ -16,7 +16,6 @@ export const Button = styled.button`
   gap: 10px;
   letter-spacing: -0.01em;
   padding: 0 12px 8px;
-  margin-bottom: 12px;
 
   svg {
     height: 10px;

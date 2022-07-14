@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export default styled.div`
-  background: #fff;
+  background-color: var(--gray-200);
   text-align: center;
   padding: 40px;
 

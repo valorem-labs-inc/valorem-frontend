@@ -1,10 +1,11 @@
 import moment from "moment";
 import { useRouter } from "next/router";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import styled from "styled-components";
 import { useOptions } from "../../graphql/hooks/useOptions";
 import BlankState from "../blankState";
 import ConnectedRoute from "../connectedRoute";
+import Loader from "../loader";
 import PositionCard from "../positionCard";
 import VaultFilter from "../vaultFilter";
 
@@ -15,14 +16,18 @@ const PageHeader = styled.div`
 const Title = styled.div`
   color: var(--purple-blue);
   font-size: 36px;
-  line-height: 1.2;
+  line-height: 1.6;
   letter-spacing: -0.01em;
 `;
 
 const OptionsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
 const statusFilters = [
@@ -58,7 +63,7 @@ const VaultView: FC = () => {
     ? dateFilters.find((f) => f.value === router.query.orderBy)
     : dateFilters[0];
 
-  const { options } = useOptions();
+  const { options, isLoading } = useOptions();
 
   const filteredOptions = options
     .filter((option) => {
@@ -75,6 +80,41 @@ const VaultView: FC = () => {
 
       return b.option.exerciseTimestamp - a.option.exerciseTimestamp;
     });
+
+  const pageBody = useMemo(() => {
+    if (isLoading) {
+      return <Loader />;
+    }
+
+    if (filteredOptions.length === 0) {
+      return (
+        <BlankState
+          title={
+            {
+              open: "You aren't holding any active options.",
+              closed: "You aren't holding any expired options.",
+            }[statusFilter.value]
+          }
+          subtitle={
+            {
+              open: 'To write a new option, click the "Write Option" button above.',
+              closed:
+                "Once options you've hold have expired, they will display here.",
+            }[statusFilter.value]
+          }
+        />
+      );
+    }
+
+    return (
+      <OptionsGrid>
+        {filteredOptions &&
+          filteredOptions.map((option) => (
+            <PositionCard details={option} key={option.option.id} />
+          ))}
+      </OptionsGrid>
+    );
+  }, [isLoading, filteredOptions, statusFilter]);
 
   return (
     <ConnectedRoute>
@@ -111,21 +151,7 @@ const VaultView: FC = () => {
             />
           </Title>
         </PageHeader>
-        <div>
-          {filteredOptions.length > 0 ? (
-            <OptionsGrid>
-              {filteredOptions &&
-                filteredOptions.map((option) => (
-                  <PositionCard details={option} key={option.option.id} />
-                ))}
-            </OptionsGrid>
-          ) : (
-            <div>
-              <p>No Options</p>
-              {/* TODO: We need a blank slate view */}
-            </div>
-          )}
-        </div>
+        <div>{pageBody}</div>
       </div>
     </ConnectedRoute>
   );

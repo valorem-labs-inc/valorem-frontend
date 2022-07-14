@@ -10,16 +10,27 @@ const VaultView = dynamic(() => import("../../components/vaultView"), {
 const Wrapper = styled.div`
   display: flex;
   max-width: 1224px;
-  margin: 64px auto 0;
+  margin: 32px auto 0;
   padding: 0 16px;
   gap: 48px;
 
   .nav-area {
+    display: none;
+    flex-grow: 0;
+    flex-shrink: 0;
     width: 270px;
   }
 
   .content-area {
     flex: 1;
+  }
+
+  @media (min-width: 640px) {
+    margin-top: 64px;
+
+    .nav-area {
+      display: block;
+    }
   }
 `;
 

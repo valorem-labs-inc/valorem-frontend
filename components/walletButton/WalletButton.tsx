@@ -47,7 +47,7 @@ const Button = styled.button`
     height: 18px;
   }
 
-  @media (min-width: 400px) {
+  @media (min-width: 640px) {
     .address {
       display: inline;
     }
