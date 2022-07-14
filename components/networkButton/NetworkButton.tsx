@@ -50,9 +50,9 @@ const Button = styled.button`
 
 function getLogoUrl(chainID: number) {
   if (chainID === 4) {
-    return "rinkeby-logo.png";
+    return "/rinkeby-logo.png";
   }
-  return "mainnet-logo.png";
+  return "/mainnet-logo.png";
 }
 
 const NetworkButton: FC = () => {

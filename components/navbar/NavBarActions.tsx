@@ -16,7 +16,9 @@ const NavBarActions: FC = () => {
 
   const { isConnected } = useAccount();
 
-  if (!isConnected || router.route === "") {
+  console.log(router.route);
+
+  if (!isConnected || router.route === "/") {
     return null;
   }
 
