@@ -41,6 +41,7 @@ export function useOptions() {
     loading: graphqlLoading,
     refetch,
   } = useQuery<GraphBalancesResponse>(optionsByAccountQuery, {
+    skip: !chain || chain.unsupported,
     variables: {
       account: address.toLowerCase(),
     },
