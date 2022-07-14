@@ -23,6 +23,10 @@ const Button = styled.button`
     background-color: var(--gray-300);
   }
 
+  & .address {
+    display: none;
+  }
+
   & .status-container {
     position: relative;
 
@@ -42,6 +46,12 @@ const Button = styled.button`
     display: block;
     height: 18px;
   }
+
+  @media (min-width: 400px) {
+    .address {
+      display: inline;
+    }
+  }
 `;
 
 const WalletButton: FC = () => {
@@ -59,7 +69,7 @@ const WalletButton: FC = () => {
           alt={`${connector.name} logo`}
         />
       </div>
-      <span>{formatAddress(address)}</span>
+      <span className="address">{formatAddress(address)}</span>
     </Button>
   );
 };

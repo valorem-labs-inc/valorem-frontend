@@ -11,12 +11,30 @@ const Wrapper = styled.div`
   gap: 16px;
 `;
 
+const DisconnectButton = styled.button`
+  background-color: transparent;
+  border-radius: 4px;
+  border: none;
+  height: 40px;
+  padding: 0 8px;
+  transition: background-color 100ms ease-in-out;
+  display: none;
+
+  &:hover {
+    background-color: var(--gray-200);
+  }
+
+  @media (min-width: 580px) {
+    & {
+      display: inline-block;
+    }
+  }
+`;
+
 const NavBarActions: FC = () => {
   const router = useRouter();
 
   const { isConnected } = useAccount();
-
-  console.log(router.route);
 
   if (!isConnected || router.route === "/") {
     return null;
@@ -26,7 +44,7 @@ const NavBarActions: FC = () => {
     <Wrapper>
       <NetworkButton />
       <WalletButton />
-      <div>
+      <DisconnectButton>
         <svg
           width="24"
           height="21"
@@ -39,7 +57,7 @@ const NavBarActions: FC = () => {
             fill="#95A3AD"
           />
         </svg>
-      </div>
+      </DisconnectButton>
     </Wrapper>
   );
 };
