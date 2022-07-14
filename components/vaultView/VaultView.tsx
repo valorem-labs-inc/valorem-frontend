@@ -4,6 +4,7 @@ import { FC } from "react";
 import styled from "styled-components";
 import { useOptions } from "../../graphql/hooks/useOptions";
 import BlankState from "../blankState";
+import ConnectedRoute from "../connectedRoute";
 import PositionCard from "../positionCard";
 import VaultFilter from "../vaultFilter";
 
@@ -76,55 +77,57 @@ const VaultView: FC = () => {
     });
 
   return (
-    <div>
-      <PageHeader>
-        <Title>
-          Viewing{" "}
-          <VaultFilter
-            value={statusFilter}
-            filters={statusFilters}
-            onChange={(filter) => {
-              router.push({
-                pathname: router.pathname,
-                query: {
-                  ...router.query,
-                  status: filter.value,
-                },
-              });
-            }}
-          />{" "}
-          positions by{" "}
-          <VaultFilter
-            value={dateFilter}
-            filters={dateFilters}
-            onChange={(filter) => {
-              router.push({
-                pathname: router.pathname,
-                query: {
-                  ...router.query,
-                  orderBy: filter.value,
-                },
-              });
-            }}
-          />
-        </Title>
-      </PageHeader>
+    <ConnectedRoute>
       <div>
-        {filteredOptions.length > 0 ? (
-          <OptionsGrid>
-            {filteredOptions &&
-              filteredOptions.map((option) => (
-                <PositionCard details={option} key={option.option.id} />
-              ))}
-          </OptionsGrid>
-        ) : (
-          <div>
-            <p>No Options</p>
-            {/* TODO: We need a blank slate view */}
-          </div>
-        )}
+        <PageHeader>
+          <Title>
+            Viewing{" "}
+            <VaultFilter
+              value={statusFilter}
+              filters={statusFilters}
+              onChange={(filter) => {
+                router.push({
+                  pathname: router.pathname,
+                  query: {
+                    ...router.query,
+                    status: filter.value,
+                  },
+                });
+              }}
+            />{" "}
+            positions by{" "}
+            <VaultFilter
+              value={dateFilter}
+              filters={dateFilters}
+              onChange={(filter) => {
+                router.push({
+                  pathname: router.pathname,
+                  query: {
+                    ...router.query,
+                    orderBy: filter.value,
+                  },
+                });
+              }}
+            />
+          </Title>
+        </PageHeader>
+        <div>
+          {filteredOptions.length > 0 ? (
+            <OptionsGrid>
+              {filteredOptions &&
+                filteredOptions.map((option) => (
+                  <PositionCard details={option} key={option.option.id} />
+                ))}
+            </OptionsGrid>
+          ) : (
+            <div>
+              <p>No Options</p>
+              {/* TODO: We need a blank slate view */}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ConnectedRoute>
   );
 };
 
