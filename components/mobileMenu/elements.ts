@@ -12,7 +12,8 @@ export const Wrapper = styled.div`
 
 export const Menu = styled.div`
   background-color: #fff;
-  width: 420px;
+  width: 80%;
+  max-width: 420px;
   height: 100vh;
 
   .top-area {

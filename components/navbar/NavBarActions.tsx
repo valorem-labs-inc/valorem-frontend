@@ -16,6 +16,7 @@ const DisconnectButton = styled.button`
   background-color: transparent;
   border-radius: 4px;
   border: none;
+  cursor: pointer;
   height: 40px;
   padding: 0 8px;
   transition: background-color 100ms ease-in-out;
@@ -36,6 +37,7 @@ const MenuButton = styled.button`
   background-color: transparent;
   border-radius: 4px;
   border: none;
+  cursor: pointer;
   height: 40px;
   padding: 0 8px;
   transition: background-color 100ms ease-in-out;
