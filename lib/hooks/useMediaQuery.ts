@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 
+// Hook to trigger behavior in a React component using css style media queries.
+// For example: calling a function when the screen reaches a certain width.
+// Code taken from: https://usehooks-ts.com/react-hook/use-media-query
+
 function useMediaQuery(query: string): boolean {
   const getMatches = (query: string): boolean => {
     // Prevents SSR issues

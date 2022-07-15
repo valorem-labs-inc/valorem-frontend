@@ -1,6 +1,12 @@
 import { RefObject, useEffect, useRef } from "react";
-
 import useIsomorphicLayoutEffect from "./useIsomorphicLayoutEffect";
+
+// Adds an event listener to an element or the window, and properly
+// handles clean up when the React component this hook is used in
+// is unmounted.
+// Used in the MobileMenu component to listen for clicks outside
+// of the menu to trigger the `onClose` prop.
+// Code taken from: https://usehooks-ts.com/react-hook/use-event-listener
 
 // Window Event based useEventListener interface
 function useEventListener<K extends keyof WindowEventMap>(
