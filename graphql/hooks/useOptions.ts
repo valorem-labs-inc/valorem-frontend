@@ -41,67 +41,70 @@ export function useOptions() {
     loading: graphqlLoading,
     refetch,
   } = useQuery<GraphBalancesResponse>(optionsByAccountQuery, {
+    skip: !chain || chain.unsupported,
     variables: {
       account: address.toLowerCase(),
     },
   });
 
   const processRawGraphResponse = useCallback(async () => {
-    const type1Balances = rawGraphResponse.account.ERC1155balances.filter(
-      ({ token }) => token.type === 1
-    );
-
-    const balanceQueries = type1Balances.map(({ token }) => {
-      const tokenContract = new Contract(
-        token.option.underlyingAsset.id,
-        erc20ABI,
-        provider
+    if (rawGraphResponse.account) {
+      const type1Balances = rawGraphResponse.account.ERC1155balances.filter(
+        ({ token }) => token.type === 1
       );
 
-      return tokenContract.balanceOf(address);
-    });
+      const balanceQueries = type1Balances.map(({ token }) => {
+        const tokenContract = new Contract(
+          token.option.underlyingAsset.id,
+          erc20ABI,
+          provider
+        );
 
-    const balances = await Promise.all(balanceQueries);
-
-    const allowanceQueries = type1Balances.map(({ token }) => {
-      const exerciseToken = new Contract(
-        token.option.exerciseAsset.id,
-        erc20ABI,
-        provider
-      );
-
-      return exerciseToken.allowance(address, optionsSettlementEngineAddress);
-    });
-
-    const allowances = await Promise.all(allowanceQueries);
-
-    const now = moment();
-
-    const _options = type1Balances
-      .map(({ token, valueExact }, index) => {
-        const tokenBalance = balances[index];
-        const graphOption = unfreezeApolloCacheValue(token.option);
-        const option = graphOptionToOption(graphOption as GraphBalanceOption);
-        const lastDate = moment.unix(option.expiryTimestamp);
-        const firstDate = moment.unix(option.exerciseTimestamp);
-        const canExercise =
-          tokenBalance.gte(option.exerciseAmount) &&
-          now.isBetween(firstDate, lastDate);
-
-        const allowance = allowances[index];
-
-        return {
-          balance: BigNumber.from(valueExact),
-          option,
-          canExercise,
-          needsApproval: allowance.lt(option.exerciseAmount),
-        } as OptionDetails;
-      })
-      .sort((a, b) => {
-        return a.option.expiryTimestamp - b.option.expiryTimestamp;
+        return tokenContract.balanceOf(address);
       });
 
-    setOptions(_options);
+      const balances = await Promise.all(balanceQueries);
+
+      const allowanceQueries = type1Balances.map(({ token }) => {
+        const exerciseToken = new Contract(
+          token.option.exerciseAsset.id,
+          erc20ABI,
+          provider
+        );
+
+        return exerciseToken.allowance(address, optionsSettlementEngineAddress);
+      });
+
+      const allowances = await Promise.all(allowanceQueries);
+
+      const now = moment();
+
+      const _options = type1Balances
+        .map(({ token, valueExact }, index) => {
+          const tokenBalance = balances[index];
+          const graphOption = unfreezeApolloCacheValue(token.option);
+          const option = graphOptionToOption(graphOption as GraphBalanceOption);
+          const lastDate = moment.unix(option.expiryTimestamp);
+          const firstDate = moment.unix(option.exerciseTimestamp);
+          const canExercise =
+            tokenBalance.gte(option.exerciseAmount) &&
+            now.isBetween(firstDate, lastDate);
+
+          const allowance = allowances[index];
+
+          return {
+            balance: BigNumber.from(valueExact),
+            option,
+            canExercise,
+            needsApproval: allowance.lt(option.exerciseAmount),
+          } as OptionDetails;
+        })
+        .sort((a, b) => {
+          return a.option.expiryTimestamp - b.option.expiryTimestamp;
+        });
+
+      setOptions(_options);
+    }
 
     setIsLoading(false);
   }, [rawGraphResponse, provider, address, optionsSettlementEngineAddress]);

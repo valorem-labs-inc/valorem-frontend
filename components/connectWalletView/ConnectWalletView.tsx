@@ -96,7 +96,7 @@ const Option = styled.button<{ selected?: boolean }>`
 
   h3 {
     color: var(--gray-800);
-    mangin: 4px 0;
+    margin: 4px 0;
   }
 
   h4 {
@@ -173,7 +173,7 @@ const ConnectWalletView: FC = () => {
     } else {
       setCanLaunch(false);
     }
-  }, [activeConnector, chain]);
+  }, [activeConnector, chain, isConnected]);
 
   return (
     <Wrapper>
@@ -293,7 +293,7 @@ const ConnectWalletView: FC = () => {
               data-testid="cta"
               disabled={!canLaunch}
               theme="purple-blue"
-              onClick={() => router.push("/vault/options")}
+              onClick={() => router.push("/vault")}
             >
               Launch
             </Button>

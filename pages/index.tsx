@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
-import NavBar from "../components/navbar";
 
 const ConnectWalletView = dynamic(
   () => import("../components/connectWalletView"),
@@ -10,12 +9,7 @@ const ConnectWalletView = dynamic(
 );
 
 const Index: NextPage = () => {
-  return (
-    <div>
-      <NavBar />
-      <ConnectWalletView />
-    </div>
-  );
+  return <ConnectWalletView />;
 };
 
 export default Index;

@@ -17,8 +17,8 @@ import { publicProvider } from "wagmi/providers/public";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 
-import StyledApp from "./_app.css";
 import { useApollo } from "../graphql/client";
+import AppShell from "../layouts/appShell";
 
 const { chains, provider, webSocketProvider } = configureChains(
   [chain.rinkeby],
@@ -42,31 +42,18 @@ const client = createClient({
   webSocketProvider,
 });
 
-function getYear() {
-  const currentYear = new Date().getFullYear();
-
-  if (currentYear > 2022) {
-    return `2022-${currentYear}`;
-  }
-
-  return currentYear;
-}
-
 function App({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps);
 
   return (
     <ApolloProvider client={apolloClient}>
       <WagmiConfig client={client}>
-        <StyledApp>
-          <Head>
-            <title>Valorem Options</title>
-          </Head>
+        <Head>
+          <title>Valorem Options</title>
+        </Head>
+        <AppShell>
           <Component {...pageProps} />
-          <footer>
-            <p>&copy; {getYear()}, Valorem Labs Inc. All rights reserved.</p>
-          </footer>
-        </StyledApp>
+        </AppShell>
       </WagmiConfig>
     </ApolloProvider>
   );
