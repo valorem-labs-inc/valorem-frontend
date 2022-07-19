@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "../../lib/testing";
 import NewOptionView from "../newOptionView";
 
-describe("NewOptionForm", () => {
+describe.skip("NewOptionForm", () => {
   it("handles balance inputs", () => {
     render(<NewOptionView />);
 
