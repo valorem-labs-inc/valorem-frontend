@@ -8,6 +8,7 @@ import Select from "../../../../components/select";
 import { TOKEN_MAP } from "../../../../lib/tokens";
 import { useNetwork } from "wagmi";
 import { useState } from "react";
+import NumberInput from "../../../../components/numberInput";
 
 const Wrapper = styled.div`
   display: flex;
@@ -63,21 +64,29 @@ const NewOptionPage: NextPage = () => {
         <VaultNavigation />
       </div>
       <div className="content-area">
-        <div style={{ width: "50%" }}>
-          <Select
-            value={value}
-            options={tokenOptions}
-            onChange={(nextValue) => setValue(nextValue)}
-          />
+        <div
+          style={{
+            alignItems: "center",
+            display: "flex",
+            gap: "20px",
+            paddingBottom: "20px",
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <NumberInput innerLabel="WETH" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <Select options={tokenOptions} value={value} />
+          </div>
         </div>
-        <div>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam
-            nam id iusto quisquam placeat nulla deserunt? Ullam autem quisquam
-            perferendis iusto ipsum corrupti dolorem, laudantium consectetur in
-            dicta quaerat magni!
-          </p>
-        </div>
+        {/* <div style={{ alignItems: "center", display: "flex", gap: "20px" }}>
+          <div style={{ flex: 1 }}>
+            <NumberInput innerLabel="WETH" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <NumberInput innerLabel="Contracts" innerLabelPosition="right" />
+          </div>
+        </div> */}
       </div>
     </Wrapper>
   );
