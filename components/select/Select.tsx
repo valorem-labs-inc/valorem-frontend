@@ -1,5 +1,6 @@
-import { FC, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import styled from "styled-components";
+import useEventListener from "../../lib/hooks/useEventListener";
 
 const Button = styled.button`
   align-items: center;
@@ -27,6 +28,7 @@ const Menu = styled.div`
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
+  z-index: 99;
 `;
 
 const Option = styled.button`
@@ -46,7 +48,7 @@ const Option = styled.button`
   }
 `;
 
-interface SelectOption {
+export interface SelectOption {
   label: string;
   value: string;
 }
@@ -59,8 +61,17 @@ interface Props {
 
 const Select: FC<Props> = ({ onChange, options, value }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEventListener("click", (e) => {
+    // @ts-ignore
+    if (!ref.current.contains(e.target)) {
+      setMenuOpen(false);
+    }
+  });
+
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <Button
         data-testid="Select__button"
         onClick={() => setMenuOpen(!menuOpen)}

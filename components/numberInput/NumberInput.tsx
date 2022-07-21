@@ -71,7 +71,9 @@ const NumberInput: FC<Props> = ({ innerLabel, innerLabelPosition }) => {
   const onBlur = () => {
     // If user types something like "2.", something that ends with a '.'
     // but no decimals, this removes the trailing '.'.
-    setValue(parseFloat(value).toString());
+    if (value !== "") {
+      setValue(parseFloat(value).toString());
+    }
   };
 
   return (

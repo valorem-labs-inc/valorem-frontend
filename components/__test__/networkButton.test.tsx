@@ -20,6 +20,6 @@ describe("NetworkButton", () => {
       screen.getByTestId("NetworkButton")
     );
 
-    expect(buttonElement).toHaveTextContent("Chain 1");
+    expect(buttonElement).toHaveTextContent("Foundry");
   });
 });

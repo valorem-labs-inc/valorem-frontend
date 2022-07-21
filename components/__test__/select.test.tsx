@@ -111,4 +111,18 @@ describe("Select component", () => {
 
     expect(screen.queryByTestId("Select__menu")).toBeNull();
   });
+
+  it("should hide the menu when an area outside of the menu is clicked", () => {
+    const buttonElement = screen.getByTestId("Select__button");
+
+    expect(screen.queryByTestId("Select__menu")).toBeNull();
+
+    fireEvent.click(buttonElement);
+
+    expect(screen.queryByTestId("Select__menu")).toBeInTheDocument();
+
+    fireEvent.click(document.body);
+
+    expect(screen.queryByTestId("Select__menu")).toBeNull();
+  });
 });
