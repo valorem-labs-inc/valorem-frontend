@@ -1,8 +1,8 @@
 // AUTOMATICALLY GENERATED FILE - SEE scripts/sync-coingecko-list.js
 import { Token } from "./types";
 
-const TOKEN_MAP: Record<string, Token[]> = {
-  development: [
+export const TOKEN_MAP: Record<number, Token[]> = {
+  4: [
     {
       name: "Wrapped Ether",
       address: "0xDf032Bc4B9dC2782Bb09352007D4C57B75160B15",
@@ -39,7 +39,7 @@ const TOKEN_MAP: Record<string, Token[]> = {
       logoURI: "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg",
     },
   ],
-  production: [
+  1: [
     {
       name: "Wrapped Ether",
       address: "0xDf032Bc4B9dC2782Bb09352007D4C57B75160B15",
@@ -76,7 +76,7 @@ const TOKEN_MAP: Record<string, Token[]> = {
       logoURI: "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg",
     },
   ],
-  test: [
+  31337: [
     {
       name: "Wrapped Ether",
       address: "0xDf032Bc4B9dC2782Bb09352007D4C57B75160B15",
@@ -1661,8 +1661,8 @@ const TOKEN_MAP: Record<string, Token[]> = {
   // ],
 };
 
-const activeTokens = TOKEN_MAP[process.env.NODE_ENV];
-if (!activeTokens) {
-  console.warn("No active tokens found for environment:", process.env.NODE_ENV);
-}
+const activeTokens = TOKEN_MAP[process.env.NODE_ENV] || [];
+// if (!activeTokens) {
+//   console.warn("No active tokens found for environment:", process.env.NODE_ENV);
+// }
 export default activeTokens;

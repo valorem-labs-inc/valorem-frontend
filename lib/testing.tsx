@@ -20,6 +20,7 @@ export const AutoConnect: React.FC = ({ children }) => {
     if (!isConnected) {
       connect({
         connector: connectors[0],
+        chainId: 31337,
       });
     }
   }, [isConnected, connect, connectors]);
@@ -69,7 +70,7 @@ export function renderHook<Result, Props>(
 }
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [chain.rinkeby],
+  [chain.foundry],
   [
     // publicProvider(),
     jsonRpcProvider({
@@ -92,17 +93,19 @@ const AllTheProviders: React.FC = ({ children }) => {
   }
 
   const mockConnector = new MockConnector({
-    chains,
+    chains: [chain.foundry, chain.rinkeby],
     options: {
-      chainId: 4,
+      // chainId: 1,
       signer: getSigner(),
     },
   });
 
+  const p = new providers.JsonRpcProvider("http://127.0.0.1:8545");
+
   const client = createClient({
     // autoConnect: true,
     connectors: [mockConnector],
-    provider,
+    provider: p,
     webSocketProvider,
   });
 
